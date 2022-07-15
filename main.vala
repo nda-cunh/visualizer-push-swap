@@ -31,6 +31,7 @@ public class MagikBox : Gtk.Box{
         this.add(new Label("\n\n"));
         this.add(b_replay);
         this.add(label_coup);
+        timerclick = new Timer ();
         b_replay.clicked.connect(() =>{programme(1);});
         button.clicked.connect(() =>{programme();});
         spinzoom.set_value(5.0);
@@ -73,9 +74,11 @@ public class MagikBox : Gtk.Box{
     private Gtk.Button b_replay;
     private Gtk.SpinButton spinspeed;
     private Gtk.SpinButton spinzoom;
+    private Timer timerclick;
 }
 
 public int calme = 0;
+public int calme2 = 0;
 
 bool list_dir() {
     
@@ -88,11 +91,18 @@ bool list_dir() {
     {
         s = fd.read_line();
         calme++;
+        calme2++;
         G_NBR_COUP++;
         if(calme == 26)
         {
             label_coup.set_text(@"\nNombre de coups $(G_NBR_COUP)\n");
             calme = 0;
+        }
+        if(calme2 == 4)
+        {
+            va.queue_draw();
+            vb.queue_draw();
+            calme2 = 0;
         }
         if(s == "ra")
             ra();
@@ -118,11 +128,10 @@ bool list_dir() {
             rrr();
         if(G_KILL == 1)
             return (false);
-        Posix.usleep(G_SPEED);
         if(G_KILL == 1)
             return (false);
-        va.queue_draw();
-        vb.queue_draw();
+
+        Posix.usleep(G_SPEED);
     }
     label_coup.set_text(@"\nNombre de coups $(G_NBR_COUP)\n");
     return (true);
@@ -181,7 +190,11 @@ public void programme(int x = 0)
 	G_KILL = 1;
 	Posix.usleep(12000);
 	Posix.system(@"./push_swap \"$(s)\" > tmp_file");
-	new Thread<bool>("CPU2", list_dir);
+	try {
+        var th1 = new Thread<bool>("CPU2", list_dir);
+    }catch(ThreadError e){
+        print ("ThreadError: %s\n", e.message);
+    }
 }
 
 bool draw_stack(Cairo.Context cr, int s)
