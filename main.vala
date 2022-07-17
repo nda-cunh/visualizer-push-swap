@@ -78,7 +78,6 @@ public class MagikBox : Gtk.Box{
 }
 
 public int calme = 0;
-public int calme2 = 0;
 
 bool list_dir() {
     
@@ -90,20 +89,8 @@ bool list_dir() {
     while(s != null)
     {
         s = fd.read_line();
-        calme++;
-        calme2++;
         G_NBR_COUP++;
-        if(calme == 26)
-        {
-            label_coup.set_text(@"\nNombre de coups $(G_NBR_COUP)\n");
-            calme = 0;
-        }
-        if(calme2 == 4)
-        {
-            va.queue_draw();
-            vb.queue_draw();
-            calme2 = 0;
-        }
+        label_coup.label = @"\nNombre de coups $(G_NBR_COUP)\n";
         if(s == "ra")
             ra();
         else if (s == "rra")
@@ -220,6 +207,8 @@ bool draw_stack(Cairo.Context cr, int s)
 		x += 2;
 	    cr.stroke ();
 	}
+	va.queue_draw();
+    vb.queue_draw();
     return true;
 }
 
