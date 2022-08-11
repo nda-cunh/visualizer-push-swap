@@ -1,4 +1,4 @@
-#Visualizateur 
+# Visualizateur 
 
 visualise la stack A et B pour push_swap de 42
 
@@ -10,7 +10,7 @@ ou
 
 ```make```
 
-##Utilisation
+## Utilisation
 
 mettre le push_swap a coté de l'executable
 et faire :
