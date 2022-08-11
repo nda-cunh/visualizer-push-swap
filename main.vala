@@ -20,6 +20,7 @@ public class MagikBox : Gtk.Box{
         b_replay = new Button.with_label("NOUVEAU");
         spinspeed = new SpinButton.with_range(1.0, 5.0, 1.0);
         spinzoom = new SpinButton.with_range(1.0, 7.0, 1.0);
+        tooogle = new Gtk.ToggleButton.with_label("Pause");
         this.set_orientation(Gtk.Orientation.VERTICAL);
         this.set_hexpand(false);
         this.set_vexpand(false);
@@ -31,9 +32,27 @@ public class MagikBox : Gtk.Box{
         this.add(new Label("\n\n"));
         this.add(b_replay);
         this.add(label_coup);
+        this.add(tooogle);
         timerclick = new Timer ();
         b_replay.clicked.connect(() =>{programme(1);});
         button.clicked.connect(() =>{programme();});
+        tooogle.toggled.connect(() =>{
+            if(tooogle.active == true)
+                G_SPEED = -1;
+            else
+            {
+                if (spinspeed.get_value() == 1.0)
+                    G_SPEED = 8000;
+                if (spinspeed.get_value() == 2.0)
+                    G_SPEED = 4000;
+                if (spinspeed.get_value() == 3.0)
+                    G_SPEED = 2000;
+                if (spinspeed.get_value() == 4.0)
+                    G_SPEED = 800;
+                if (spinspeed.get_value() == 5.0)
+                    G_SPEED = 100;
+            }
+        });
         spinzoom.set_value(5.0);
         spinzoom.value_changed.connect(() =>{
             if (spinzoom.get_value() == 7.0)
@@ -74,6 +93,7 @@ public class MagikBox : Gtk.Box{
     private Gtk.Button b_replay;
     private Gtk.SpinButton spinspeed;
     private Gtk.SpinButton spinzoom;
+    private Gtk.ToggleButton tooogle;
     private Timer timerclick;
 }
 
@@ -83,14 +103,19 @@ bool list_dir() {
     
     var fd = FileStream.open("tmp_file", "r");
     var s = "";
-    
+
     G_KILL = 0;
     G_NBR_COUP = 0;
     while(s != null)
     {
         s = fd.read_line();
         G_NBR_COUP++;
-        label_coup.label = @"\nNombre de coups $(G_NBR_COUP)\n";
+        calme++;
+        if(calme == 12)
+        {
+            label_coup.label = @"\nNombre de coups $(G_NBR_COUP)\n";
+            calme = 0;
+        }
         if(s == "ra")
             ra();
         else if (s == "rra")
@@ -118,8 +143,12 @@ bool list_dir() {
         if(G_KILL == 1)
             return (false);
 
+
+        while(G_SPEED == -1)
+            Posix.usleep(50);
         Posix.usleep(G_SPEED);
     }
+    Posix.usleep(5000);
     label_coup.set_text(@"\nNombre de coups $(G_NBR_COUP)\n");
     return (true);
 }
@@ -168,7 +197,6 @@ public void programme(int x = 0)
 		s_a.pop_head();
 		s_b.pop_head();
 	}
-	
 	foreach (var i in G_TAB)
 	{
 	    s_a.push_tail(i);
