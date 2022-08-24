@@ -4,7 +4,7 @@ using Gtk;
 
 Queue<int> s_a;
 Queue<int> s_b;
-int G_ZOOM = 7;
+int G_ZOOM = 3;
 int G_SPEED = 5000;
 DrawingArea va;
 DrawingArea vb;
@@ -53,7 +53,7 @@ public class MagikBox : Gtk.Box{
                     G_SPEED = 100;
             }
         });
-        spinzoom.set_value(5.0);
+        spinzoom.set_value(3.0);
         spinzoom.value_changed.connect(() =>{
             G_ZOOM = (int)spinzoom.get_value();
             Posix.usleep(5000);
