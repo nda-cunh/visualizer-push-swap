@@ -55,22 +55,7 @@ public class MagikBox : Gtk.Box{
         });
         spinzoom.set_value(5.0);
         spinzoom.value_changed.connect(() =>{
-            if (spinzoom.get_value() == 7.0)
-                G_ZOOM = 1;
-            if (spinzoom.get_value() == 6.0)
-                G_ZOOM = 3;
-            if (spinzoom.get_value() == 5.0)
-                G_ZOOM = 7;
-            if (spinzoom.get_value() == 4.0)
-                G_ZOOM = 12;
-            if (spinzoom.get_value() == 3.0)
-                G_ZOOM = 20;
-            if (spinzoom.get_value() == 2.0)
-                G_ZOOM = 30;
-            if (spinzoom.get_value() == 1.0)
-                G_ZOOM = 35;
-            va.queue_draw();
-            vb.queue_draw();
+            G_ZOOM = (int)spinzoom.get_value();
             Posix.usleep(5000);
         });
         spinspeed.set_value(2);
@@ -230,9 +215,10 @@ bool draw_stack(Cairo.Context cr, int s)
 		
 		color_a = ((double)item * 0.8 / 1000) + 0.2;
 		cr.set_source_rgb (color_a, 0, 0);
+		cr.set_line_width(G_ZOOM);
 		cr.move_to (0, x);
-	    cr.line_to (item / G_ZOOM, x);
-		x += 2;
+	    cr.line_to (item / 4, x);
+		x += G_ZOOM;
 	    cr.stroke ();
 	}
 	va.queue_draw();
