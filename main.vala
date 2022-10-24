@@ -1,242 +1,210 @@
-//valac main.vala function.vala --pkg=gtk+-3.0 --pkg=posix
-
+// modules: gtk+-3.0 posix
+// sources: function.vala
+using Posix;
 using Gtk;
 
 Queue<int> s_a;
 Queue<int> s_b;
-int G_ZOOM = 3;
-int G_SPEED = 5000;
-DrawingArea va;
-DrawingArea vb;
-int NBR_SIZE;
-int G_NBR_COUP;
-Gtk.Label label_coup;
-
-public class MagikBox : Gtk.Box{
-    public MagikBox()
-    {
-        label_coup = new Gtk.Label.with_mnemonic(@"\nNombre de coups $(G_NBR_COUP)\n");
-        button = new Button.with_label("Replay");
-        b_replay = new Button.with_label("NOUVEAU");
-        spinspeed = new SpinButton.with_range(1.0, 5.0, 1.0);
-        spinzoom = new SpinButton.with_range(1.0, 7.0, 1.0);
-        tooogle = new Gtk.ToggleButton.with_label("Pause");
-        this.set_orientation(Gtk.Orientation.VERTICAL);
-        this.set_hexpand(false);
-        this.set_vexpand(false);
-        this.add(button);
-        this.add(new Label("ZOOM"));
-        this.add(spinzoom);
-        this.add(new Label("SPEED"));
-        this.add(spinspeed);
-        this.add(new Label("\n\n"));
-        this.add(b_replay);
-        this.add(label_coup);
-        this.add(tooogle);
-        timerclick = new Timer ();
-        b_replay.clicked.connect(() =>{programme(1);});
-        button.clicked.connect(() =>{programme();});
-        tooogle.toggled.connect(() =>{
-            if(tooogle.active == true)
-                G_SPEED = -1;
-            else
-            {
-                if (spinspeed.get_value() == 1.0)
-                    G_SPEED = 8000;
-                if (spinspeed.get_value() == 2.0)
-                    G_SPEED = 4000;
-                if (spinspeed.get_value() == 3.0)
-                    G_SPEED = 2000;
-                if (spinspeed.get_value() == 4.0)
-                    G_SPEED = 800;
-                if (spinspeed.get_value() == 5.0)
-                    G_SPEED = 100;
-            }
-        });
-        spinzoom.set_value(3.0);
-        spinzoom.value_changed.connect(() =>{
-            G_ZOOM = (int)spinzoom.get_value();
-            Posix.usleep(5000);
-        });
-        spinspeed.set_value(2);
-        spinspeed.value_changed.connect(() =>{
-            if (spinspeed.get_value() == 1.0)
-                G_SPEED = 8000;
-            if (spinspeed.get_value() == 2.0)
-                G_SPEED = 4000;
-            if (spinspeed.get_value() == 3.0)
-                G_SPEED = 2000;
-            if (spinspeed.get_value() == 4.0)
-                G_SPEED = 800;
-            if (spinspeed.get_value() == 5.0)
-                G_SPEED = 100;
-            Posix.usleep(5000);
-        });
-        this.margin = 10;
-    }
-    private Gtk.Button button;
-    private Gtk.Button b_replay;
-    private Gtk.SpinButton spinspeed;
-    private Gtk.SpinButton spinzoom;
-    private Gtk.ToggleButton tooogle;
-    private Timer timerclick;
-}
-
-public int calme = 0;
-
-bool list_dir() {
-    
-    var fd = FileStream.open("tmp_file", "r");
-    var s = "";
-
-    G_KILL = 0;
-    G_NBR_COUP = 0;
-    while(s != null)
-    {
-        s = fd.read_line();
-        G_NBR_COUP++;
-        calme++;
-        if(calme == 12)
-        {
-            label_coup.label = @"\nNombre de coups $(G_NBR_COUP)\n";
-            calme = 0;
-        }
-        if(s == "ra")
-            ra();
-        else if (s == "rra")
-            rra();
-        else if (s == "sa")
-            sa();
-        else if (s == "sb")
-            sb();
-        else if (s == "ss")
-            ss();
-        else if (s == "pb")
-            pb();
-        else if (s == "pa")
-            pa();
-        else if (s == "rb")
-            rb();
-        else if (s == "rrb")
-            rrb();
-        else if (s == "rr")
-            rr();
-        else if (s == "rrr")
-            rrr();
-        if(G_KILL == 1)
-            return (false);
-        if(G_KILL == 1)
-            return (false);
-
-
-        while(G_SPEED == -1)
-            Posix.usleep(50);
-        Posix.usleep(G_SPEED);
-    }
-    Posix.usleep(5000);
-    label_coup.set_text(@"\nNombre de coups $(G_NBR_COUP)\n");
-    return (true);
-}
-
-int main (string[] args) {
-	Gtk.init (ref args);
-
-    s_a = new Queue<int>();
-    s_b = new Queue<int>();
-	var window = new Window ();
-	va = new DrawingArea ();
-	vb = new DrawingArea ();
-	window.set_default_size (900, 500);
-	var box = new Box (Gtk.Orientation.HORIZONTAL, 0);
-	var multibox = new MagikBox();
-	box.add(multibox);
-	//box.set_homogeneous (true);
-	box.add (va);
-	va.draw.connect((cr) => {return (draw_stack(cr, 1));});
-	va.set_hexpand(true);
-	vb.draw.connect((cr) => {return (draw_stack(cr, 2));});
-	vb.set_hexpand(true);
-	box.add (vb);
-	window.title = "vizualizer";
-	window.destroy.connect (Gtk.main_quit);
-    window.add (box);
-	window.show_all ();
-	(args[1] != null) ? NBR_SIZE = int.parse(args[1]) : NBR_SIZE = 500;
-	print("%d\n\n\n\n", NBR_SIZE);
-	G_TAB = get_random_tab(NBR_SIZE);
-	programme();
-	Gtk.main ();
-	return 0;
-}
-int G_KILL;
+Mutex mutex_gtk;
+int G_SIZE = 100;
+int G_ZOOM = 4;
+int G_SPEED = 25000;
+Gtk.DrawingArea va;
+Gtk.DrawingArea vb;
+bool G_KILL = false;
+bool G_PAUSE = false;
 int []G_TAB;
+Label g_label;
 
-public void programme(int x = 0)
+bool draw_stack(Cairo.Context cr, bool stack)
 {
-    
-	var s = "";
-	if(x == 1)
-	    G_TAB = get_random_tab(NBR_SIZE);
-	while(s_a.get_length() != 0 || s_b.get_length() != 0)
-    {
-		s_a.pop_head();
-		s_b.pop_head();
-	}
-	foreach (var i in G_TAB)
-	{
-	    s_a.push_tail(i);
-	    s +=i.to_string() + " ";
-	}
-	G_KILL = 1;
-	Posix.usleep(12000);
-	Posix.system(@"./push_swap \"$(s)\" > tmp_file");
-	try {
-        var th1 = new Thread<bool>("CPU2", list_dir);
-    }catch(ThreadError e){
-        print ("ThreadError: %s\n", e.message);
-    }
+	Queue<int>	copy;                                  
+	double		color_a;                                   
+	var			x = 0;
+	var			y = 0.0;
+
+	if (G_SIZE >= 2)
+		y = 35.0;
+	if (G_SIZE >= 25)
+		y = 6.0;
+	if (G_SIZE >= 45)
+		y = 5.0;
+	if (G_SIZE >= 90)
+		y = 2.0;
+	if (G_SIZE >= 299)
+		y = 0.8;
+	if (G_SIZE >= 400)
+		y = 0.5;
+
+	cr.set_line_width (1);                            
+	if(stack)                                        
+		copy = s_a.copy();                            
+	else                                              
+		copy = s_b.copy();                            
+	while(copy.get_length() != 0)                     
+	{                                                 
+		int item = copy.pop_head();                   
+
+		color_a = ((double)item * 0.8 / G_SIZE) + 0.2;  
+		cr.set_source_rgb (color_a, 0, 0);            
+		cr.set_line_width(G_ZOOM);                    
+		cr.move_to (0, x);                            
+		cr.line_to (item * y, x);           
+		x += G_ZOOM;                                  
+		cr.stroke ();                                 
+	}                             
+	return true;                                      
 }
 
-bool draw_stack(Cairo.Context cr, int s)
+void main(string []args)
 {
-    Queue<int> copy;
-    var x = 0;
-    double color_a;    
-    
-	cr.set_line_width (1);
-	
-    if(s == 1)
-        copy = s_a.copy();
-    else
-        copy = s_b.copy();
-    while(copy.get_length() != 0)
-    {
-		int item = copy.pop_head();
-		
-		color_a = ((double)item * 0.8 / 1000) + 0.2;
-		cr.set_source_rgb (color_a, 0, 0);
-		cr.set_line_width(G_ZOOM);
-		cr.move_to (0, x);
-	    cr.line_to (item / 4, x);
-		x += G_ZOOM;
-	    cr.stroke ();
-	}
+	Gtk.init (ref args);
+	mutex_gtk = Mutex();
+	G_SIZE = (args[1] == null) ? 44 : int.parse(args[1]);
+
+	var builder = new Gtk.Builder.from_file ("index.ui");
+	builder.connect_signals (null);
+
+	va = builder.get_object ("drawing_a") as Gtk.DrawingArea;
+	vb = builder.get_object ("drawing_b") as Gtk.DrawingArea;
+	va.draw.connect((cr) => {return (draw_stack(cr, true));});
+	vb.draw.connect((cr) => {return (draw_stack(cr, false));});
+	g_label = builder.get_object ("nbr_coup") as Gtk.Label;
+	programme();
+	while(true)                    
+	{
+		usleep(500);
+		mutex_gtk.lock();
+		main_iteration_do(false);
+		mutex_gtk.unlock();
+	}                              
+}
+
+//redraw the stack A and B
+void refresh()
+{
 	va.queue_draw();
-    vb.queue_draw();
-    return true;
+	vb.queue_draw();
+}
+
+// Analyse Flux Stdin of push_swap and call good function
+void list_dir(int	fd_in) {
+
+	var fd = FileStream.fdopen(fd_in, "r");
+	var s = "";
+	var nb = 0;
+
+	while(!fd.eof())
+	{
+		if (G_PAUSE)
+		{
+			usleep(500);
+			continue;
+		}
+		if(G_KILL)
+		{
+			G_KILL = false;
+			print("Thread terminée");
+			return ;
+		}
+		s = fd.read_line();
+		if(s == "ra")
+			ra();
+		else if (s == "rra")
+			rra();
+		else if (s == "sa")
+			sa();
+		else if (s == "sb")
+			sb();
+		else if (s == "ss")
+			ss();
+		else if (s == "pb")
+			pb();
+		else if (s == "pa")
+			pa();
+		else if (s == "rb")
+			rb();
+		else if (s == "rrb")
+			rrb();
+		else if (s == "rr")
+			rr();
+		else if (s == "rrr")
+			rrr();
+		else
+			continue;
+		nb++;
+		mutex_gtk.lock();
+		g_label.label = nb.to_string();
+		refresh();
+		mutex_gtk.unlock();
+		Posix.usleep(G_SPEED);
+	}
+}
+
+// run the push_swap programme
+int run_push_swap(string tab, out int pid)
+{
+	int fds[2];
+	string	emp;
+
+	if (!(Posix.access("./push_swap", X_OK) == 0))
+	{
+		print("[Info]: recherche de push_swap ../");
+		emp = "../push_swap";
+	}
+	else
+		emp = "./push_swap";
+	pipe(fds);
+	pid = fork();
+	if (pid == 0)
+	{	
+		close(fds[0]);
+		dup2(fds[1], 1);
+		execv(emp, {"push_swap", tab});
+		exit(0);
+	}
+	close(fds[1]);
+	return (fds[0]);
+}
+
+void programme(bool replay = false)
+{
+	s_a = new Queue<int>();
+	s_b = new Queue<int>();
+	print("nouveau programme\n");
+	new Thread<void>("prog", () => {
+		var s = "";
+		if (replay == false)
+			G_TAB = get_random_tab(G_SIZE);	
+		while (s_a.get_length() != 0 || s_b.get_length() != 0)
+		{
+			s_a.pop_head();
+			s_b.pop_head();
+		}
+		foreach (var i in G_TAB)
+		{
+			s_a.push_tail(i);
+			s +=i.to_string() + " ";
+		}
+		print("lancement avec :%s\n", s);
+		int pid;
+		int fd = run_push_swap(s, out pid);
+		list_dir(fd);
+		kill(pid, 9);
+	});
 }
 
 int []get_random_tab(int size)
 {
-    var tab = new int[size];
-    var nb = 0;
-    for(int i = 0; i!= size; i++)
- 	{ 
- 	    nb = Random.int_range(0, 1000); 
- 		if(nb in tab) 
- 			i--; 
- 		else 
- 			tab[i] = nb;
- 	} 
-    return tab;
+	var tab = new int[size];
+	var nb = 0;
+	for(int i = 0; i!= size; i++)
+	{
+		nb = Random.int_range(1, size + 1);
+		if(nb in tab)
+			i--;
+		else
+			tab[i] = nb;
+	}
+	return tab;
 }
