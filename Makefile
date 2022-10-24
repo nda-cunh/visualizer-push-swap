@@ -1,5 +1,5 @@
 all:
-	valac *.vala --pkg=gtk+-3.0 --pkg=posix -X -O3 -o vizualizer
+	valac *.vala -g --pkg=gtk+-3.0 --pkg=posix -X -export-dynamic -o vizualizer
 
 run:
 	./vizualizer
