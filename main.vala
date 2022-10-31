@@ -1,5 +1,5 @@
 // modules: gtk+-3.0 posix
-// sources: function.vala
+// sources: function.vala inde.vala
 using Posix;
 using Gtk;
 
@@ -62,7 +62,7 @@ void main(string []args)
 	mutex_gtk = Mutex();
 	G_SIZE = (args[1] == null) ? 44 : int.parse(args[1]);
 
-	var builder = new Gtk.Builder.from_file ("index.ui");
+	var builder = new Gtk.Builder.from_string(INDEX_UI, INDEX_UI.length);
 	builder.connect_signals (null);
 
 	va = builder.get_object ("drawing_a") as Gtk.DrawingArea;
