@@ -3,6 +3,6 @@ all:
 
 run:
 	./vizualizer
-	
-install:
-	echo null	
+
+fclean:
+	rm -rf *.c vizualizer
