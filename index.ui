@@ -21,6 +21,7 @@
     <property name="can-focus">False</property>
     <property name="default-width">800</property>
     <property name="default-height">450</property>
+    <signal name="destroy" handler="kick" swapped="no"/>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>

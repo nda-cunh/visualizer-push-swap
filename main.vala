@@ -14,6 +14,7 @@ Gtk.DrawingArea vb;
 bool G_KILL = false;
 bool G_PAUSE = false;
 int []G_TAB;
+bool g_running = true;
 Label g_label;
 
 bool draw_stack(Cairo.Context cr, bool stack)
@@ -36,24 +37,24 @@ bool draw_stack(Cairo.Context cr, bool stack)
 	if (G_SIZE >= 400)
 		y = 0.5;
 
-	cr.set_line_width (1);                            
-	if(stack)                                        
-		copy = s_a.copy();                            
-	else                                              
-		copy = s_b.copy();                            
-	while(copy.get_length() != 0)                     
-	{                                                 
-		int item = copy.pop_head();                   
+	cr.set_line_width (1);
+	if(stack)
+		copy = s_a.copy();
+	else
+		copy = s_b.copy();
+	while(copy.get_length() != 0)
+	{
+		int item = copy.pop_head();
 
-		color_a = ((double)item * 0.8 / G_SIZE) + 0.2;  
-		cr.set_source_rgb (color_a, 0, 0);            
-		cr.set_line_width(G_ZOOM);                    
-		cr.move_to (0, x);                            
-		cr.line_to (item * y, x);           
-		x += G_ZOOM;                                  
-		cr.stroke ();                                 
-	}                             
-	return true;                                      
+		color_a = ((double)item * 0.8 / G_SIZE) + 0.2;
+		cr.set_source_rgb (color_a, 0, 0);
+		cr.set_line_width(G_ZOOM);
+		cr.move_to (0, x);            
+		cr.line_to (item * y, x);
+		x += G_ZOOM;
+		cr.stroke ();
+	}
+	return true;
 }
 
 void main(string []args)
@@ -71,13 +72,21 @@ void main(string []args)
 	vb.draw.connect((cr) => {return (draw_stack(cr, false));});
 	g_label = builder.get_object ("nbr_coup") as Gtk.Label;
 	programme();
-	while(true)                    
+	while(g_running)
 	{
 		usleep(500);
 		mutex_gtk.lock();
 		main_iteration_do(false);
 		mutex_gtk.unlock();
-	}                              
+	}
+	G_KILL = true;
+	main_quit();
+}
+
+public void kick()
+{
+	print("terminee\n");
+	g_running = false;
 }
 
 //redraw the stack A and B

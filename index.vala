@@ -1,4 +1,5 @@
-public const string INDEX_UI = """<?xml version="1.0" encoding="UTF-8"?>
+public const string INDEX_UI = """
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
@@ -21,6 +22,7 @@ public const string INDEX_UI = """<?xml version="1.0" encoding="UTF-8"?>
     <property name="can-focus">False</property>
     <property name="default-width">800</property>
     <property name="default-height">450</property>
+    <signal name="destroy" handler="kick" swapped="no"/>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
