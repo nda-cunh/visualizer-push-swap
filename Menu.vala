@@ -11,12 +11,13 @@ enum TypeEvent {
 class Menu : Gtk.Box {
 	public Menu() {
 		Object(orientation: Gtk.Orientation.VERTICAL);
-		b_replay = new Gtk.Button.with_label("Replay");
+		base.name = "menu";
+		box_replay_new = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+		b_replay = new Gtk.Button.with_label("Replay"){name="replay"};
+		b_nouveau = new Gtk.Button.with_label("New"){name="nouveau"};
 		b_step = new Gtk.Button.with_label("Step");
-		b_nouveau = new Gtk.Button.with_label("New");
 		t_continue = new Gtk.ToggleButton.with_label("Stop");
 		l_count = new Gtk.Label("0");
-		l_action = new Gtk.Label("");
 		b_spin = new Gtk.SpinButton.with_range(1.0, 5.0, 1.0);
 		b_spin.value = 3.0;
 		this.attach();
@@ -30,24 +31,22 @@ class Menu : Gtk.Box {
 		t_continue.set_active(true);
 		count = 0;
 		l_count.label = "0";
-		l_action.label = "";
 
 	}
 	
 	public void iterate_count(ref string line) {
 		count++;
-		l_count.label = @"$count";
-		l_action.label = line;
+		l_count.label = @"$line $count";
 	}
 
 	private void attach() {
-		base.pack_start(b_replay, false, false, 0);
-		base.pack_start(b_nouveau, false, false, 0);
+		box_replay_new.pack_start(b_nouveau, false, false, 0);
+		box_replay_new.pack_start(b_replay, false, false, 0);
+		base.pack_start(box_replay_new, false, false, 0);
 		base.pack_start(b_spin, false, false, 0);
 		base.pack_start(t_continue, false, false, 0);
 		base.pack_start(b_step, false, false, 0);
 		base.pack_start(l_count, false, false, 0);
-		base.pack_start(l_action, false, false, 0);
 	}
 
 	private void init_event() {
@@ -82,10 +81,10 @@ class Menu : Gtk.Box {
 	
 	public int					count;
 	private Gtk.SpinButton		b_spin;
+	private Gtk.Box				box_replay_new;
 	private Gtk.Button			b_replay;
 	private Gtk.Button			b_step;
 	private Gtk.Button			b_nouveau;
 	private Gtk.ToggleButton	t_continue;
 	private Gtk.Label			l_count;
-	private Gtk.Label			l_action;
 }

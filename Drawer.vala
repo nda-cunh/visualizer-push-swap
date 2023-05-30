@@ -51,7 +51,7 @@ class DrawStack : Gtk.DrawingArea {
 
 		y = G_ZOOM;
 
-		var copy = stack.copy();
+		Queue<int> copy = stack.copy();
 		ctx.set_line_width (1);
 		while(copy.get_length() != 0)
 		{
