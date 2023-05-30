@@ -1,9 +1,9 @@
 //valac main.vala Window.vala Menu.vala Drawer.vala Utils.vala function.vala  --pkg=gtk+-3.0 --pkg=posix --vapidir=./vapi
 
 class Window : Gtk.Window {
-	public Window(ref string path, int nb) {
+	public Window(ref string exec, int nb) {
 		Object(default_width: 1000, default_height: 600);
-		this.path = path;
+		this.exec = exec;
 		this.nb_max = nb;
 		book = new Gtk.Notebook(){show_tabs=false};
 		box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
@@ -39,7 +39,7 @@ class Window : Gtk.Window {
 		is_running = true;
 		if (is_replay == false){
 			tab = Utils.get_random_tab(nb_max);
-			stream = Utils.new_prog(ref path, tab, ref is_running);
+			stream = Utils.new_prog(ref exec, tab, ref is_running);
 		}
 		is_replay = false;
 		if (stream == null || stream == ""){
@@ -67,7 +67,6 @@ class Window : Gtk.Window {
 			timer.reset();
 			timer.elapsed(out microseconds);
 			while(speed >= microseconds || is_stop == true) {
-				print("test\n");
 				timer.elapsed(out microseconds);
 				if (is_step) {
 					is_step = false;
@@ -202,7 +201,7 @@ class Window : Gtk.Window {
 	private bool is_replay;
 	private bool is_running;
 	private int nb_max;
-	private string path;
+	private string exec;
 	private Queue<int> stackA;
 	private Queue<int> stackB;
 	private DrawStack draw_stackA;

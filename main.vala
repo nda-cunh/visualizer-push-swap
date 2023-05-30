@@ -31,6 +31,13 @@ int	main(string []args)
 	if (nb >= 1 && nb <= 1000)
 	{
 		Gtk.init(ref args);
+		try {
+		var css = new Gtk.CssProvider();
+		css.load_from_buffer(css_data.data);
+		Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css, 3);
+		}catch(Error e){
+			printerr("Erreur au niveau du chargement CSS (%s)\n", e.message);
+		}
 		new Window(ref path, nb);
 		Gtk.main();
 	} else {
@@ -38,3 +45,12 @@ int	main(string []args)
 	}
 	return (0);
 }
+
+public const string css_data = """
+button, spinbutton{
+	padding-right:15px;
+	padding-left:15px;
+	margin:4px;
+	margin-top:15px;
+}
+""";
