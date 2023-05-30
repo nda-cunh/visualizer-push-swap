@@ -1,8 +1,14 @@
-run:
-	valac main.vala Window.vala Menu.vala Drawer.vala Utils.vala function.vala --pkg=gtk+-3.0 --pkg=posix --vapidir=./vapi -o main
-	./main 5
+SRC = main.vala Window.vala Menu.vala Drawer.vala Utils.vala function.vala
+LIB = --pkg=gtk+-3.0 --pkg=posix
+NAME = visualiser
 
-run2:
-	valac main.vala Window.vala Menu.vala Drawer.vala Utils.vala function.vala --pkg=gtk+-3.0 --pkg=posix --vapidir=./vapi -o main
-	
-	GTK_DEBUG=interactive ./main 5
+all: $(NAME)
+
+$(NAME) : $(SRC)
+	valac $(SRC) $(LIB) -o $(NAME)
+
+run: all
+	./$(NAME) $(ARG)
+
+run2: all
+	GTK_DEBUG=interactive ./$(NAME) $(ARG)
