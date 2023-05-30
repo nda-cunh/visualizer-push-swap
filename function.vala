@@ -1,51 +1,51 @@
-//valac main.vala function.vala --pkg=gtk+-3.0 --pkg=posix
- 
-void ra()
+void ra(Queue<int> s_a)
 {
     int tmp = s_a.pop_head();
     s_a.push_tail(tmp);
 }
-void rra()
+void rra(Queue<int> s_a)
 {
     int tmp = s_a.pop_tail();
     s_a.push_head(tmp);
 }
-void pb()
+void pb(Queue<int> s_a, Queue<int> s_b)
 {
     int tmp = s_a.pop_head();
     s_b.push_head(tmp);
 }
-void pa()
+
+void pa(Queue<int> s_a, Queue<int> s_b)
 {
     int tmp = s_b.pop_head();
     s_a.push_head(tmp);
 }
 
-void rb()
+void rb(Queue<int> s_b)
+
 {
     int tmp = s_b.pop_head();
     s_b.push_tail(tmp);
 }
 
-void rrb()
+void rrb(Queue<int> s_b)
 {
     int tmp = s_b.pop_tail();
     s_b.push_head(tmp);
 }
 
-void rr()
+void rr(Queue<int> s_a, Queue<int> s_b)
 {
-    ra();
-    rb();
+    ra(s_a);
+    rb(s_b);
 }
 
-void rrr()
+void rrr(Queue<int> s_a, Queue<int> s_b)
 {
-    rra();
-    rrb();
+    rra(s_a);
+    rrb(s_b);
 }
 
-void sa()
+void sa(Queue<int> s_a)
 {
     int tmp1 = s_a.pop_head();
     int tmp2 = s_a.pop_head();
@@ -53,15 +53,15 @@ void sa()
     s_a.push_head(tmp2);
 }
 
-void sb()
+void sb(Queue<int> s_b)
 {
     int tmp1 = s_b.pop_head();
     int tmp2 = s_b.pop_head();
     s_b.push_head(tmp1);
     s_b.push_head(tmp2);
 }
-void ss()
+void ss(Queue<int> s_a, Queue<int> s_b)
 {
-    sa();
-    sb();
+    sa(s_a);
+    sb(s_b);
 }
