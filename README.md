@@ -4,7 +4,13 @@ visualise la stack A et B pour push_swap de 42
 
 <img src="push_viz.gif"/>
 
+## Installation
+
 ```make```
+
+ou
+
+```valac *.vala --pkg=gtk+-3.0 --pkg=posix -o visualiser```
 
 ## Utilisation
 
