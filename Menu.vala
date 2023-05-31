@@ -48,6 +48,10 @@ class Menu : Gtk.Box {
 		base.pack_start(b_step, false, false, 0);
 		base.pack_start(l_count, false, false, 0);
 	}
+	
+	public void hide_new() {
+		b_nouveau.visible  = false;
+	}
 
 	private void init_event() {
 		b_replay.clicked.connect(() => {

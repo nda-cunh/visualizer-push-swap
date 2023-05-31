@@ -21,11 +21,18 @@ bool search_path(out string? path) {
 int	main(string []args)
 {
 	string? path;
+	int []range_nb = {};
+
 	if (search_path(out path) == false)
 		return -1;
 	if (args[1] == null){
 		printerr("Il manque un parametre : visualizer 1-1000\n");
 		return -1;
+	}
+	if (args.length >= 3) {
+		foreach (var i in args[1 : args.length]) {
+			range_nb += int.parse(i);
+		}
 	}
 	int nb = int.parse(args[1]);
 	if (nb >= 1 && nb <= 1000)
@@ -38,7 +45,7 @@ int	main(string []args)
 		}catch(Error e){
 			printerr("Erreur au niveau du chargement CSS (%s)\n", e.message);
 		}
-		new Window(ref path, nb);
+		new Window(ref path, nb, ref range_nb);
 		Gtk.main();
 	} else {
 		printerr("Un nombre entre 1 et 1000\n");
