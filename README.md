@@ -19,4 +19,8 @@ et faire :
 
 ```./visualiser <1-1000>```
 
+	ou pour mettre vos valeur:
+
+```./visualiser 5 4 3 2 1```
+
 xxx représente la stack que le programme generera.
