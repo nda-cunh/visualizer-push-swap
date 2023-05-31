@@ -1,8 +1,9 @@
 //valac main.vala Window.vala Menu.vala Drawer.vala Utils.vala function.vala  --pkg=gtk+-3.0 --pkg=posix --vapidir=./vapi
 
 class Window : Gtk.Window {
-	public Window(ref string exec, int nb) {
+	public Window(ref string exec, int nb, ref int []range) {
 		Object(default_width: 1000, default_height: 600);
+		this.range = range;
 		this.exec = exec;
 		this.nb_max = nb;
 		book = new Gtk.Notebook(){show_tabs=false};
@@ -23,7 +24,7 @@ class Window : Gtk.Window {
 		book.append_page(new Gtk.Label("Loading"));
 		base.show_all ();
 		this.init_event();
-		book.page = 1; 
+		book.page = 1;
 	}
 
 	public void init() {
@@ -38,7 +39,12 @@ class Window : Gtk.Window {
 	public void loading() {
 		is_running = true;
 		if (is_replay == false){
-			tab = Utils.get_random_tab(nb_max);
+			if (range != null) {
+				menu.hide_new();
+				tab = range;
+			}
+			else
+				tab = Utils.get_random_tab(nb_max);
 			stream = Utils.new_prog(ref exec, tab, ref is_running);
 		}
 		is_replay = false;
@@ -192,6 +198,7 @@ class Window : Gtk.Window {
 		);
 	}
 
+	private unowned int []range;
 	private int speed;
 	private string stream;
 	private int []tab;
