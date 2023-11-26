@@ -16,7 +16,8 @@ class Menu : Gtk.Box {
 		b_replay = new Gtk.Button.with_label("Replay"){name="replay"};
 		b_nouveau = new Gtk.Button.with_label("New"){name="nouveau"};
 		b_step = new Gtk.Button.with_label("Step");
-		t_continue = new Gtk.ToggleButton.with_label("Stop");
+		t_continue = new Gtk.ToggleButton.with_label("Continue");
+		t_continue.active = true;
 		l_count = new Gtk.Label("0");
 		b_spin = new Gtk.SpinButton.with_range(1.0, 7.0, 1.0);
 		b_spin.value = 3.0;

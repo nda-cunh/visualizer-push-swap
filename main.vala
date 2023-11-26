@@ -41,21 +41,12 @@ int	main(string []args)
 	if (nb >= 1 && nb <= 1000)
 	{
 		Gtk.init(ref args);
-		try {
-			// var css = new Gtk.CssProvider();
-			// css.load_from_data(css_data);
-			// Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css, 0);
-
-		}catch(Error e){
-			printerr("Erreur au niveau du chargement CSS (%s)\n", e.message);
-		}
 		new Window(nb, ref range_nb);
 		Gtk.main();
+		return (0);
 	}
-	else {
-		printerr("Un nombre entre 1 et 1000\n");
-	}
-	return (0);
+	printerr("Un nombre entre 1 et 1000\n");
+	return (-1);
 }
 
 public const string css_data = """

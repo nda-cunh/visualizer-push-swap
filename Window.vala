@@ -21,8 +21,13 @@ class Window : Gtk.Window {
 		base.show_all ();
 		this.init_event();
 			var css_provider = new Gtk.CssProvider();
-			css_provider.load_from_data(css_data);
+			try {
+				css_provider.load_from_data(css_data);
+			} catch (Error e) {
+				warning(e.message);
+			}
 			Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER);
+		is_stop = true;
 		loading.begin();
 	}
 
