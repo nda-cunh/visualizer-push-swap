@@ -10,7 +10,7 @@ enum TypeEvent {
 
 class Menu : Gtk.Box {
 	public Menu() {
-		Object(orientation: Gtk.Orientation.VERTICAL);
+		Object(orientation: Gtk.Orientation.VERTICAL, spacing:8);
 		base.name = "menu";
 		box_replay_new = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
 		b_replay = new Gtk.Button.with_label("Replay"){name="replay"};
@@ -18,24 +18,14 @@ class Menu : Gtk.Box {
 		b_step = new Gtk.Button.with_label("Step");
 		t_continue = new Gtk.ToggleButton.with_label("Stop");
 		l_count = new Gtk.Label("0");
-		b_spin = new Gtk.SpinButton.with_range(1.0, 5.0, 1.0);
+		b_spin = new Gtk.SpinButton.with_range(1.0, 7.0, 1.0);
 		b_spin.value = 3.0;
 		this.attach();
 		b_step.visible = false;
 		init_event();
 	}
 	
-	public void init() {
-		t_continue.label = "Continue";
-		b_step.visible = true;
-		t_continue.set_active(true);
-		count = 0;
-		l_count.label = "0";
-
-	}
-	
-	public void iterate_count(ref string line) {
-		count++;
+	public void iterate_count(string line, int count) {
 		l_count.label = @"$line $count";
 	}
 
@@ -49,10 +39,6 @@ class Menu : Gtk.Box {
 		base.pack_start(l_count, false, false, 0);
 	}
 	
-	public void hide_new() {
-		b_nouveau.visible  = false;
-	}
-
 	private void init_event() {
 		b_replay.clicked.connect(() => {
 			onEvent(TypeEvent.REPLAY);
@@ -83,7 +69,6 @@ class Menu : Gtk.Box {
 	public signal void onEvent(TypeEvent type);
 	public signal void onChangeSpeed(int speed);
 	
-	public int					count;
 	private Gtk.SpinButton		b_spin;
 	private Gtk.Box				box_replay_new;
 	private Gtk.Button			b_replay;

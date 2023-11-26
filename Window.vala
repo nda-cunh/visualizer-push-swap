@@ -1,21 +1,17 @@
-//valac main.vala Window.vala Menu.vala Drawer.vala Utils.vala function.vala  --pkg=gtk+-3.0 --pkg=posix --vapidir=./vapi
-
 class Window : Gtk.Window {
-	public Window(ref string exec, int nb, ref int []range) {
+	public Window(int nb, ref int []range) {
 		Object(default_width: 1000, default_height: 600);
 		this.range = range;
-		this.exec = exec;
 		this.nb_max = nb;
 		book = new Gtk.Notebook(){show_tabs=false};
 		box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
 		stackA = new Queue<int>();
 		stackB = new Queue<int>();
-		draw_stackA = new DrawStack(ref stackA, nb);
-		draw_stackB = new DrawStack(ref stackB, nb);
+		draw_stackA = new DrawStack(ref stackA, nb_max);
+		draw_stackB = new DrawStack(ref stackB, nb_max);
 		menu = new Menu();
 		is_replay = false;
 		speed = 4000;
-		
 		box.pack_start(menu, false, false, 0);
 		box.pack_start(draw_stackA, true, true, 0);
 		box.pack_start(draw_stackB, true, true, 0);
@@ -24,66 +20,72 @@ class Window : Gtk.Window {
 		book.append_page(new Gtk.Label("Loading"));
 		base.show_all ();
 		this.init_event();
-		book.page = 1;
+			var css_provider = new Gtk.CssProvider();
+			css_provider.load_from_data(css_data);
+			Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER);
+		loading.begin();
 	}
 
-	public void init() {
-		is_running = false;
-		is_step = false;
+	public async void loading() {
+		if (is_running == true) {
+			is_killing = true;
+			book.page = 1;
+			while (is_killing == true)
+				yield Utils.sleep(500);
+		}
+		is_running = true;
+		book.page = 1;
+
+		if (is_replay == false) {
+			tab = Utils.get_random_tab(nb_max);
+			var thread = new Thread<string>(null, () => {
+				var tab_str = new StringBuilder.sized(16384);
+				string output;
+				
+				foreach (var i in tab) {
+					tab_str.append_printf("%d ", i);
+				}
+				try {
+					Process.spawn_sync(null, {PUSH_SWAP_EMP, tab_str.str}, null, 0, null, out output);
+				}
+				catch(Error e) {
+					printerr(e.message);
+				}
+				Idle.add(loading.callback);
+				return output;
+			});
+			yield;
+			stream = thread.join();
+		}
+		
 		stackA.clear();
 		stackB.clear();
-		menu.init();
-		is_stop = true;
-	}
-
-	public void loading() {
-		is_running = true;
-		if (is_replay == false){
-			if (range != null) {
-				menu.hide_new();
-				tab = range;
-			}
-			else
-				tab = Utils.get_random_tab(nb_max);
-			stream = Utils.new_prog(ref exec, tab, ref is_running);
-		}
-		is_replay = false;
-		if (stream == null || stream == ""){
-			printerr("Error: timeout, ou chaine vide [%s] ", stream);
-			book.page = 0;
-			is_running = false;
-			return ;
-		}
+		menu.iterate_count("", 0);
 		foreach (var i in tab) {
 			stackA.push_tail(i);
 		}
 		book.page = 0;
-		run_programme(stream);
-		is_running = false;
+		run_programme.begin(stream);
 	}
 
-	private void run_programme(string stream) {
+	private async void run_programme(string stream) {
 		var split = stream.strip().split("\n");
 		int count = 0;
-		ulong microseconds;
-		Timer timer = new Timer();
-		timer.start();
-
+		
 		foreach(var line in split) {
-			timer.reset();
-			timer.elapsed(out microseconds);
-			while(speed >= microseconds || is_stop == true) {
-				timer.elapsed(out microseconds);
-				if (is_step) {
+			yield Utils.usleep(speed);
+			while (is_stop && is_killing == false) {
+				yield Utils.sleep(200);
+				if (is_step == true) {
 					is_step = false;
 					break;
 				}
-				if (is_running == false)
-					break;
-				Gtk.main_iteration_do(false);
 			}
-			if (is_running == false)
-				break;
+			
+			if (is_killing == true) {
+				is_killing = false;
+				return ;
+			}
 			count++;
 			switch (line) {
 				case "ra":
@@ -124,31 +126,25 @@ class Window : Gtk.Window {
 					print(@"Commentaire : $line\n");
 					  break;
 			}
-			menu.iterate_count(ref line);
+			menu.iterate_count(line, count);
 			draw_stackA.queue_draw();
 			draw_stackB.queue_draw();
 		}
+		is_running = false;
 		print("Fin du programme\n");
 	}
 
 	
 	private void init_event() {
 		
-		book.notify["page"].connect(()=> {
-			if (book.page == 1) {
-				print("CONTINUE");
-				this.init();
-				Gtk.main_iteration();
-				this.loading();
-			}
-		});
-
+		// Event window cross
 		this.destroy.connect(() => {
 			is_running = false;
 			Gtk.main_quit();
-			Posix.exit(0);
+			Process.exit(0);
 		});
-		
+	
+		// Event Speed [-/+]
 		menu.onChangeSpeed.connect((speed) => {
 			switch (speed) {
 				case 1:
@@ -166,31 +162,43 @@ class Window : Gtk.Window {
 				case 5:
 					this.speed = 500;
 					break;
+				case 6:
+					this.speed = 150;
+					break;
+				case 7:
+					this.speed = 1;
+					break;
 			}
 		});
+
+		// Button  [Continue] [Replay] and other...
 		menu.onEvent.connect((type) => {
 			switch (type) {
 				case TypeEvent.CONTINUE:
-					print("Continue");
+					print("continue\n");
 					is_stop = false;
 					break;
 				case TypeEvent.NEW:
 					print("nouveau\n");
-					is_stop = false;
-					book.page = 1;
+					Idle.add(()=> {
+						loading.begin();
+						return false;
+					});
 					break;
 				case TypeEvent.REPLAY:
-					print("replay");
-					is_stop = false;
+					print("replay\n");
 					is_replay = true;
-					book.page = 1;
+					Idle.add(()=> {
+						loading.begin();
+						return false;
+					});
 					break;
 				case TypeEvent.STOP:
-					print("stop");
+					print("stop\n");
 					is_stop = true;
 					break;
 				case TypeEvent.STEP:
-					print("step");
+					print("step\n");
 					is_step = true;
 					break;
 			}
@@ -198,21 +206,26 @@ class Window : Gtk.Window {
 		);
 	}
 
-	private unowned int []range;
-	private int speed;
-	private string stream;
-	private int []tab;
-	private Gtk.Notebook book;
+	// STATUS
+	private bool is_killing;
 	private bool is_stop;
 	private bool is_step;
 	private bool is_replay;
 	private bool is_running;
-	private int nb_max;
-	private string exec;
-	private Queue<int> stackA;
-	private Queue<int> stackB;
+
+	// WIDGET
 	private DrawStack draw_stackA;
 	private DrawStack draw_stackB;
 	private Menu menu;
 	private Gtk.Box box;
+	private Gtk.Notebook book;
+
+	// GLOBAL
+	private unowned int []range;
+	private int speed;
+	private string stream;
+	private int []tab;
+	private int nb_max;
+	private Queue<int> stackA;
+	private Queue<int> stackB;
 }

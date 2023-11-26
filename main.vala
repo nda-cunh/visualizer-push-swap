@@ -3,13 +3,13 @@
 bool search_path(out string? path) {
 	print("recherche de:	 ./push_swap\n");
 	if (FileUtils.test("push_swap", FileTest.EXISTS | FileTest.IS_EXECUTABLE)) {
-		FileUtils.chmod("push_swap", 755);
+		FileUtils.chmod("push_swap", 0000755);
 		path = "push_swap";
 		return true;
 	}
 	print("recherche de:	 ../push_swap\n");
 	if (FileUtils.test("../push_swap", FileTest.EXISTS | FileTest.IS_EXECUTABLE)) {
-		FileUtils.chmod("../push_swap", 755);
+		FileUtils.chmod("../push_swap", 0000755);
 		path = "../push_swap";
 		return true;
 	}
@@ -18,6 +18,8 @@ bool search_path(out string? path) {
 	return false;
 }
 
+public string PUSH_SWAP_EMP;
+
 int	main(string []args)
 {
 	string? path;
@@ -25,6 +27,7 @@ int	main(string []args)
 
 	if (search_path(out path) == false)
 		return -1;
+	PUSH_SWAP_EMP = path;
 	if (args[1] == null){
 		printerr("Il manque un parametre : visualizer 1-1000\n");
 		return -1;
@@ -39,15 +42,17 @@ int	main(string []args)
 	{
 		Gtk.init(ref args);
 		try {
-			var css = new Gtk.CssProvider();
-			css.load_from_buffer(css_data.data);
-			Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css, 3);
+			// var css = new Gtk.CssProvider();
+			// css.load_from_data(css_data);
+			// Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css, 0);
+
 		}catch(Error e){
 			printerr("Erreur au niveau du chargement CSS (%s)\n", e.message);
 		}
-		new Window(ref path, nb, ref range_nb);
+		new Window(nb, ref range_nb);
 		Gtk.main();
-	} else {
+	}
+	else {
 		printerr("Un nombre entre 1 et 1000\n");
 	}
 	return (0);
@@ -57,13 +62,8 @@ public const string css_data = """
 #menu {
 	padding:8px;
 }
-#menu button,entry{
-	margin-top: 10px;
-	padding-right:10px;
-	padding-left:10px;
-}
-#replay{
 
+#replay{
 	border-radius: 0px 25px 25px 0px / 0px 50px 50px 0px;
 }
 #nouveau{

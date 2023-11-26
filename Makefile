@@ -1,7 +1,7 @@
 SRC = main.vala Window.vala Menu.vala Drawer.vala Utils.vala function.vala
-LIB = --pkg=gtk+-3.0 --pkg=posix
+LIB = --pkg=gtk+-3.0 -X -w --pkg=posix
 NAME = visualiser
-
+ARG := 500 
 all: $(NAME)
 
 $(NAME) : $(SRC)
