@@ -66,6 +66,7 @@ public class Window : Gtk.Window {
 				foreach (var i in tab) {
 					tab_str.append_printf("%d ", i);
 				}
+				print("Input :[%s]", tab_str.str);
 				try {
 					Process.spawn_sync(null, {PUSH_SWAP_EMP, tab_str.str}, null, 0, null, out output);
 				}
@@ -132,10 +133,6 @@ public class Window : Gtk.Window {
 				else if (target < split_len)
 					target++;
 			}
-
-			print("target:		%d\n", target);
-			print("count:		%d\n", count);
-			print(@"is_scalt:	$(is_scaling)\n");
 
 			if (target > count) {
 				if (count < split_len) {
