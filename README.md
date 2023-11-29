@@ -1,20 +1,25 @@
 # Visualizateur 
 
-visualise la stack A et B pour push_swap de 42
+visualizes stack A and B for push_swap of 42
 
 <img src="push_viz.gif"/>
 
 ## Installation
 
+git clone it:
+```git clone https://gitlab.com/hydrasho/visualizer-push-swap```
+
+for 42 Angouleme or if you have valac dependency :
 ```make```
 
-ou
+Other campus or if you don't have vala compiler :
 
-```valac *.vala --pkg=gtk+-3.0 -o visualiser```
+```make bootstrap```
 
-## Utilisation
+he use C-Code instead of vala code
 
-mettre le push_swap a coté de l'executable ou derriere
-et faire :
+## how use it 
+
+he search your push_swap here:  ./push_swap  or  ../push_swap
 
 ```./visualiser <1-1000>```
