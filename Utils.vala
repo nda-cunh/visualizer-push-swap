@@ -4,10 +4,14 @@ namespace Utils{
 		yield;
 	}
 	public async void usleep(int time) {
-		new Thread<void>(null, ()=> {
-			Thread.usleep(time);
+		if (time != 0) {
+			new Thread<void>(null, ()=> {
+				Thread.usleep(time);
+				Idle.add(usleep.callback);
+			});
+		}
+		else
 			Idle.add(usleep.callback);
-		});
 		yield;
 	}
 

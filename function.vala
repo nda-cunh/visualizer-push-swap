@@ -60,6 +60,7 @@ void sb(Queue<int> s_b)
     s_b.push_head(tmp1);
     s_b.push_head(tmp2);
 }
+
 void ss(Queue<int> s_a, Queue<int> s_b)
 {
     sa(s_a);

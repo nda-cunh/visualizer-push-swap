@@ -54,10 +54,10 @@ public const string css_data = """
 	padding:8px;
 }
 
-#replay{
+.right{
 	border-radius: 0px 25px 25px 0px / 0px 50px 50px 0px;
 }
-#nouveau{
+.left{
 	border-radius: 25px 0px 0px 25px / 50px 0px 0px 50px;
 }
 """;

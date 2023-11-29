@@ -1,8 +1,10 @@
-class Window : Gtk.Window {
+public class Window : Gtk.Window {
 	public Window(int nb, ref int []range) {
 		Object(default_width: 1000, default_height: 600);
+		
 		this.range = range;
 		this.nb_max = nb;
+
 		book = new Gtk.Notebook(){show_tabs=false};
 		box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
 		stackA = new Queue<int>();
@@ -10,24 +12,37 @@ class Window : Gtk.Window {
 		draw_stackA = new DrawStack(ref stackA, nb_max);
 		draw_stackB = new DrawStack(ref stackB, nb_max);
 		menu = new Menu();
-		is_replay = false;
-		speed = 4000;
+		
 		box.pack_start(menu, false, false, 0);
 		box.pack_start(draw_stackA, true, true, 0);
 		box.pack_start(draw_stackB, true, true, 0);
-		base.child = book;
 		book.append_page(box);
 		book.append_page(new Gtk.Label("Loading"));
+		
+		var top = new Gtk.Box(Gtk.Orientation.VERTICAL, 0){child=book};
+		scale = new Gtk.Scale.with_range(Gtk.Orientation.HORIZONTAL, 0.0, 100.0, 1.0);
+		scale.change_value.connect((a, b)=> {
+			scale.set_value(b);
+			target = (int)scale.get_value();
+			is_scaling = true;
+			is_stop = false;
+			speed = 0;
+			menu.scaling_mode();
+			return false;
+		});
+		top.pack_end(scale, false);
+		base.child = top;
 		base.show_all ();
+		
+		var provider = new Gtk.CssProvider();
+		try {
+			provider.load_from_data(css_data);
+		} catch (Error e) {
+			warning(e.message);
+		}
+		Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_USER);
+
 		this.init_event();
-			var css_provider = new Gtk.CssProvider();
-			try {
-				css_provider.load_from_data(css_data);
-			} catch (Error e) {
-				warning(e.message);
-			}
-			Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_USER);
-		is_stop = true;
 		loading.begin();
 	}
 
@@ -41,6 +56,7 @@ class Window : Gtk.Window {
 		is_running = true;
 		book.page = 1;
 
+		// Run a push_swap thread if replay is false
 		if (is_replay == false) {
 			tab = Utils.get_random_tab(nb_max);
 			var thread = new Thread<string>(null, () => {
@@ -75,69 +91,179 @@ class Window : Gtk.Window {
 
 	private async void run_programme(string stream) {
 		var split = stream.strip().split("\n");
+		var split_len = split.length;
 		int count = 0;
+		target = 0;
+		scale.set_value(0);
+		scale.set_range(0.0, (double)split_len);
 		
-		foreach(var line in split) {
+		while (true) {
+		
 			yield Utils.usleep(speed);
+			
 			while (is_stop && is_killing == false) {
 				yield Utils.sleep(200);
 				if (is_step == true) {
 					is_step = false;
+					if (target < split_len)
+						target++;
+					break;
+				}
+				if (is_backstep == true) {
+					is_backstep = false;
+					if (target > 0)
+						target--;
 					break;
 				}
 			}
-			
+		
+			// Loading Kill infinit loop
 			if (is_killing == true) {
 				is_killing = false;
 				return ;
 			}
-			count++;
-			switch (line) {
-				case "ra":
-					  ra(stackA);
-					  break;
-				case "rra":
-					  rra(stackA);
-					  break;
-				case "sa":
-					  sa(stackA);
-					  break;
-				case "pa":
-					  pa(stackA, stackB);
-					  break;
-				case "rb":
-					  rb(stackB);
-					  break;
-				case "rrb":
-					  rrb(stackB);
-					  break;
-				case "sb":
-					  sb(stackB);
-					  break;
-				case "pb":
-					  pb(stackA, stackB);
-					  break;
-				case "ss":
-					  ss(stackA, stackB);
-					  break;
-				case "rr":
-					  rr(stackA, stackB);
-					  break;
-				case "rrr":
-					  rrr(stackA, stackB);
-					  break;
-				default:
-					count--;
-					print(@"Commentaire : $line\n");
-					  break;
+
+		
+			if (is_stop == false && is_scaling == false) {
+				if (is_reverse) {
+					if (target > 0)
+						target--;
+				}
+				else if (target < split_len)
+					target++;
 			}
-			menu.iterate_count(line, count);
+
+			print("target:		%d\n", target);
+			print("count:		%d\n", count);
+			print(@"is_scalt:	$(is_scaling)\n");
+
+			if (target > count) {
+				if (count < split_len) {
+					if (forward(split[count]))
+						count++;
+				}
+			}
+			else if (target < count) {
+				if (reverse(split[count - 1]))
+					count--;
+			}
+
+			scale.set_value((double)target);
+			if (count == 0)
+				menu.iterate_count("", count);
+			else
+				menu.iterate_count(split[count - 1], count);
 			draw_stackA.queue_draw();
 			draw_stackB.queue_draw();
 		}
-		is_running = false;
-		print("Fin du programme\n");
 	}
+
+
+
+
+
+
+
+	public bool reverse(string line)
+	{
+		switch (line)
+		{
+			case "ra":
+					rra(stackA);
+					break;
+			case "rra":
+					ra(stackA);
+					break;
+			case "sa":
+					sa(stackA);
+					break;
+			case "pa":
+					pb(stackA, stackB);
+					break;
+			case "rb":
+					rrb(stackB);
+					break;
+			case "rrb":
+					rb(stackB);
+					break;
+			case "sb":
+					sb(stackB);
+					break;
+			case "pb":
+					pa(stackA, stackB);
+					break;
+			case "ss":
+					ss(stackA, stackB);
+					break;
+			case "rr":
+					rrr(stackA, stackB);
+					break;
+			case "rrr":
+					rr(stackA, stackB);
+					break;
+			default:
+				print(@"Commentaire : $line\n");
+				return false;
+			}
+		return true;
+	}
+
+
+
+
+
+
+
+
+
+
+	public bool forward (string line)
+	{
+		switch (line) {
+			case "ra":
+					ra(stackA);
+					break;
+			case "rra":
+					rra(stackA);
+					break;
+			case "sa":
+					sa(stackA);
+					break;
+			case "pa":
+					pa(stackA, stackB);
+					break;
+			case "rb":
+					rb(stackB);
+					break;
+			case "rrb":
+					rrb(stackB);
+					break;
+			case "sb":
+					sb(stackB);
+					break;
+			case "pb":
+					pb(stackA, stackB);
+					break;
+			case "ss":
+					ss(stackA, stackB);
+					break;
+			case "rr":
+					rr(stackA, stackB);
+					break;
+			case "rrr":
+					rrr(stackA, stackB);
+					break;
+			default:
+				print(@"Commentaire : $line\n");
+				return false;
+			}								
+			return true;
+	}
+
+
+
+
+
 
 	
 	private void init_event() {
@@ -178,6 +304,8 @@ class Window : Gtk.Window {
 
 		// Button  [Continue] [Replay] and other...
 		menu.onEvent.connect((type) => {
+			is_scaling = false;
+			menu.refresh_speed();
 			switch (type) {
 				case TypeEvent.CONTINUE:
 					print("continue\n");
@@ -187,6 +315,8 @@ class Window : Gtk.Window {
 					print("nouveau\n");
 					Idle.add(()=> {
 						loading.begin();
+						is_stop = true;
+						menu.scaling_mode();
 						return false;
 					});
 					break;
@@ -204,19 +334,39 @@ class Window : Gtk.Window {
 					break;
 				case TypeEvent.STEP:
 					print("step\n");
+					is_stop = true;
 					is_step = true;
+					break;
+				case TypeEvent.BACKSTEP:
+					print("backstep\n");
+					is_stop = true;
+					is_backstep = true;
+					break;
+				case TypeEvent.FORWARD:
+					print("forward\n");
+					is_reverse = false;
+					break;
+				case TypeEvent.REVERSE:
+					print("reverse\n");
+					is_reverse = true;
 					break;
 			}
 		}
 		);
 	}
 
+
+
+
 	// STATUS
-	private bool is_killing;
-	private bool is_stop;
-	private bool is_step;
-	private bool is_replay;
-	private bool is_running;
+	private bool is_killing {get; set; default=false;}
+	private bool is_stop {get; set; default=true;}
+	private bool is_step {get; set; default=false;}
+	private bool is_backstep {get; set; default=false;}
+	private bool is_replay {get; set; default=false;}
+	private bool is_running {get; set; default=false;}
+	private bool is_reverse {get; set; default=false;}
+	private bool is_scaling {get; set; default=false;}
 
 	// WIDGET
 	private DrawStack draw_stackA;
@@ -224,13 +374,16 @@ class Window : Gtk.Window {
 	private Menu menu;
 	private Gtk.Box box;
 	private Gtk.Notebook book;
+	private Gtk.Scale scale;
 
 	// GLOBAL
+	private int target;
 	private unowned int []range;
-	private int speed;
+	private int speed {get; set; default=4000;}
 	private string stream;
 	private int []tab;
 	private int nb_max;
 	private Queue<int> stackA;
 	private Queue<int> stackB;
+
 }
