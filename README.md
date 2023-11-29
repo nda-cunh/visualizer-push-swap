@@ -10,7 +10,7 @@ visualise la stack A et B pour push_swap de 42
 
 ou
 
-```valac *.vala --pkg=gtk+-3.0 --pkg=posix -o visualiser```
+```valac *.vala --pkg=gtk+-3.0 -o visualiser```
 
 ## Utilisation
 
