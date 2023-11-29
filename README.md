@@ -14,13 +14,7 @@ ou
 
 ## Utilisation
 
-mettre le push_swap a coté de l'executable
+mettre le push_swap a coté de l'executable ou derriere
 et faire :
 
 ```./visualiser <1-1000>```
-
-	ou pour mettre vos valeur:
-
-```./visualiser 5 4 3 2 1```
-
-xxx représente la stack que le programme generera.
