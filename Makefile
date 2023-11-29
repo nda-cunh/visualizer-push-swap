@@ -17,7 +17,7 @@ $(SRC_C):
 	tar -xf ccode.tar -C .
 
 bootstrap: $(SRC_C)
-	gcc $(SRC_C) -O2 -w `pkg-config --cflags --libs gtk+-3.0` -o out
+	gcc $(SRC_C) -O2 -w `pkg-config --cflags --libs gtk+-3.0` -o $(NAME) 
 
 
 re: clean all
