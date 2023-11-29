@@ -2,7 +2,6 @@
 
 enum TypeEvent {
 	CONTINUE,
-	REPLAY,
 	NEW,
 	STOP,
 	STEP,
@@ -16,29 +15,24 @@ class Menu : Gtk.Box {
 
 		Object(orientation: Gtk.Orientation.VERTICAL, spacing:8, name: "menu");
 		base.vexpand = true;
+
 		// [ Widget Init ]
-		box_replay_new = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-		b_replay = new Gtk.Button.with_label("Replay")				{name="replay"};
-		b_replay.get_style_context().add_class("right");
-		b_nouveau = new Gtk.Button.with_label("New")				{name="nouveau"};
-		b_nouveau.get_style_context().add_class("left");
-		box_replay_new = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-		
+		b_nouveau = new Gtk.Button.with_label("New")				{name="new"};
 
 		var box_step = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
-		
+
 		b_step = new Gtk.Button()	{name="step"};
 		b_step.child = new Gtk.Image.from_icon_name("pan-end-symbolic", Gtk.IconSize.BUTTON);
 		b_step.get_style_context().add_class("right");
-		
+
 		b_backstep = new Gtk.Button()			{name="backstep"};
 		b_backstep.child = new Gtk.Image.from_icon_name("pan-start-symbolic", Gtk.IconSize.BUTTON);
 		b_backstep.get_style_context().add_class("left");
 
-		
+
 		box_step.pack_start(b_backstep);
 		box_step.pack_start(b_step);
-		
+
 		t_continue = new Gtk.ToggleButton.with_label("Continue")	{active = true};
 		t_reverse = new Gtk.ToggleButton()		{active = true};
 		i_reverse = new Gtk.Image.from_icon_name("media-skip-backward-symbolic", Gtk.IconSize.BUTTON);
@@ -59,14 +53,10 @@ class Menu : Gtk.Box {
 
 	// Add all element like button to Menu Bar
 	private void init_menu(Gtk.Box box) {
-		box_replay_new.pack_start(b_nouveau, false, false, 0);
-		box_replay_new.pack_start(b_replay, false, false, 0);
-		base.pack_start(box_replay_new, false, false, 0);
+		base.pack_start(b_nouveau, false, false, 0);
 		base.pack_start(b_spin, false, false, 0);
 		base.pack_start(t_continue, false, false, 0);
 		base.pack_start(box, false, false, 0);
-		// base.pack_start(b_step, false, false, 0);
-		// base.pack_start(b_backstep, false, false, 0);
 		base.pack_start(l_count, false, false, 0);
 		base.pack_start(t_reverse, true, true, 5);
 	}
@@ -86,9 +76,6 @@ class Menu : Gtk.Box {
 
 	// init all Events of widgets
 	private void init_event() {
-		b_replay.clicked.connect(() => {
-			onEvent(TypeEvent.REPLAY);
-		});
 		b_nouveau.clicked.connect(() => {
 			onEvent(TypeEvent.NEW);
 		});
@@ -100,7 +87,7 @@ class Menu : Gtk.Box {
 		});
 
 		t_continue.toggled.connect(() => {
-			
+
 			b_step.visible = !b_step.visible;
 			b_backstep.visible = !b_backstep.visible;
 
@@ -113,9 +100,9 @@ class Menu : Gtk.Box {
 				onEvent(TypeEvent.CONTINUE);
 			}
 		});
-		
+
 		t_reverse.toggled.connect(() => {
-			
+
 			if (t_reverse.get_active()) {
 				i_reverse.icon_name = "media-skip-backward-symbolic";
 				onEvent(TypeEvent.FORWARD);
@@ -134,10 +121,8 @@ class Menu : Gtk.Box {
 
 	public signal void onEvent(TypeEvent type);
 	public signal void onChangeSpeed(int speed);
-	
+
 	private Gtk.SpinButton		b_spin;
-	private Gtk.Box				box_replay_new;
-	private Gtk.Button			b_replay;
 	private Gtk.Button			b_step;
 	private Gtk.Button			b_backstep;
 	private Gtk.Button			b_nouveau;

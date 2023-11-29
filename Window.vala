@@ -1,7 +1,7 @@
 public class Window : Gtk.Window {
 	public Window(int nb, ref int []range) {
 		Object(default_width: 1000, default_height: 600);
-		
+
 		this.range = range;
 		this.nb_max = nb;
 
@@ -12,28 +12,28 @@ public class Window : Gtk.Window {
 		draw_stackA = new DrawStack(ref stackA, nb_max);
 		draw_stackB = new DrawStack(ref stackB, nb_max);
 		menu = new Menu();
-		
+
 		box.pack_start(menu, false, false, 0);
 		box.pack_start(draw_stackA, true, true, 0);
 		box.pack_start(draw_stackB, true, true, 0);
 		book.append_page(box);
 		book.append_page(new Gtk.Label("Loading"));
-		
+
 		var top = new Gtk.Box(Gtk.Orientation.VERTICAL, 0){child=book};
 		scale = new Gtk.Scale.with_range(Gtk.Orientation.HORIZONTAL, 0.0, 100.0, 1.0);
 		scale.change_value.connect((a, b)=> {
-			scale.set_value(b);
-			target = (int)scale.get_value();
-			is_scaling = true;
-			is_stop = false;
-			speed = 0;
-			menu.scaling_mode();
-			return false;
-		});
+				scale.set_value(b);
+				target = (int)scale.get_value();
+				is_scaling = true;
+				is_stop = false;
+				speed = 0;
+				menu.scaling_mode();
+				return false;
+				});
 		top.pack_end(scale, false);
 		base.child = top;
 		base.show_all ();
-		
+
 		var provider = new Gtk.CssProvider();
 		try {
 			provider.load_from_data(css_data);
@@ -60,26 +60,26 @@ public class Window : Gtk.Window {
 		if (is_replay == false) {
 			tab = Utils.get_random_tab(nb_max);
 			var thread = new Thread<string>(null, () => {
-				var tab_str = new StringBuilder.sized(16384);
-				string output;
-				
-				foreach (var i in tab) {
+					var tab_str = new StringBuilder.sized(16384);
+					string output;
+
+					foreach (var i in tab) {
 					tab_str.append_printf("%d ", i);
-				}
-				print("Input :[%s]", tab_str.str);
-				try {
+					}
+					print("Input :[%s]", tab_str.str);
+					try {
 					Process.spawn_sync(null, {PUSH_SWAP_EMP, tab_str.str}, null, 0, null, out output);
-				}
-				catch(Error e) {
+					}
+					catch(Error e) {
 					printerr(e.message);
-				}
-				Idle.add(loading.callback);
-				return output;
-			});
+					}
+					Idle.add(loading.callback);
+					return output;
+					});
 			yield;
 			stream = thread.join();
 		}
-		
+
 		stackA.clear();
 		stackB.clear();
 		menu.iterate_count("", 0);
@@ -97,11 +97,11 @@ public class Window : Gtk.Window {
 		target = 0;
 		scale.set_value(0);
 		scale.set_range(0.0, (double)split_len);
-		
+
 		while (true) {
-		
+
 			yield Utils.usleep(speed);
-			
+
 			while (is_stop && is_killing == false) {
 				yield Utils.sleep(200);
 				if (is_step == true) {
@@ -117,14 +117,14 @@ public class Window : Gtk.Window {
 					break;
 				}
 			}
-		
+
 			// Loading Kill infinit loop
 			if (is_killing == true) {
 				is_killing = false;
 				return ;
 			}
 
-		
+
 			if (is_stop == false && is_scaling == false) {
 				if (is_reverse) {
 					if (target > 0)
@@ -166,42 +166,42 @@ public class Window : Gtk.Window {
 		switch (line)
 		{
 			case "ra":
-					rra(stackA);
-					break;
+				rra(stackA);
+				break;
 			case "rra":
-					ra(stackA);
-					break;
+				ra(stackA);
+				break;
 			case "sa":
-					sa(stackA);
-					break;
+				sa(stackA);
+				break;
 			case "pa":
-					pb(stackA, stackB);
-					break;
+				pb(stackA, stackB);
+				break;
 			case "rb":
-					rrb(stackB);
-					break;
+				rrb(stackB);
+				break;
 			case "rrb":
-					rb(stackB);
-					break;
+				rb(stackB);
+				break;
 			case "sb":
-					sb(stackB);
-					break;
+				sb(stackB);
+				break;
 			case "pb":
-					pa(stackA, stackB);
-					break;
+				pa(stackA, stackB);
+				break;
 			case "ss":
-					ss(stackA, stackB);
-					break;
+				ss(stackA, stackB);
+				break;
 			case "rr":
-					rrr(stackA, stackB);
-					break;
+				rrr(stackA, stackB);
+				break;
 			case "rrr":
-					rr(stackA, stackB);
-					break;
+				rr(stackA, stackB);
+				break;
 			default:
 				print(@"Commentaire : $line\n");
 				return false;
-			}
+		}
 		return true;
 	}
 
@@ -218,60 +218,54 @@ public class Window : Gtk.Window {
 	{
 		switch (line) {
 			case "ra":
-					ra(stackA);
-					break;
+				ra(stackA);
+				break;
 			case "rra":
-					rra(stackA);
-					break;
+				rra(stackA);
+				break;
 			case "sa":
-					sa(stackA);
-					break;
+				sa(stackA);
+				break;
 			case "pa":
-					pa(stackA, stackB);
-					break;
+				pa(stackA, stackB);
+				break;
 			case "rb":
-					rb(stackB);
-					break;
+				rb(stackB);
+				break;
 			case "rrb":
-					rrb(stackB);
-					break;
+				rrb(stackB);
+				break;
 			case "sb":
-					sb(stackB);
-					break;
+				sb(stackB);
+				break;
 			case "pb":
-					pb(stackA, stackB);
-					break;
+				pb(stackA, stackB);
+				break;
 			case "ss":
-					ss(stackA, stackB);
-					break;
+				ss(stackA, stackB);
+				break;
 			case "rr":
-					rr(stackA, stackB);
-					break;
+				rr(stackA, stackB);
+				break;
 			case "rrr":
-					rrr(stackA, stackB);
-					break;
+				rrr(stackA, stackB);
+				break;
 			default:
 				print(@"Commentaire : $line\n");
 				return false;
-			}								
-			return true;
+			}
+		return true;
 	}
 
 
 
-
-
-
-	
 	private void init_event() {
-		
 		// Event window cross
 		this.destroy.connect(() => {
 			is_running = false;
 			Gtk.main_quit();
-			Process.exit(0);
 		});
-	
+
 		// Event Speed [-/+]
 		menu.onChangeSpeed.connect((speed) => {
 			switch (speed) {
@@ -317,14 +311,6 @@ public class Window : Gtk.Window {
 						return false;
 					});
 					break;
-				case TypeEvent.REPLAY:
-					print("replay\n");
-					is_replay = true;
-					Idle.add(()=> {
-						loading.begin();
-						return false;
-					});
-					break;
 				case TypeEvent.STOP:
 					print("stop\n");
 					is_stop = true;
@@ -348,22 +334,19 @@ public class Window : Gtk.Window {
 					is_reverse = true;
 					break;
 			}
-		}
-		);
+		});
 	}
 
 
-
-
 	// STATUS
-	private bool is_killing {get; set; default=false;}
-	private bool is_stop {get; set; default=true;}
-	private bool is_step {get; set; default=false;}
-	private bool is_backstep {get; set; default=false;}
-	private bool is_replay {get; set; default=false;}
-	private bool is_running {get; set; default=false;}
-	private bool is_reverse {get; set; default=false;}
-	private bool is_scaling {get; set; default=false;}
+	private bool is_killing		{get; set; default=false;}
+	private bool is_stop		{get; set; default=true;}
+	private bool is_step		{get; set; default=false;}
+	private bool is_backstep	{get; set; default=false;}
+	private bool is_replay		{get; set; default=false;}
+	private bool is_running		{get; set; default=false;}
+	private bool is_reverse		{get; set; default=false;}
+	private bool is_scaling		{get; set; default=false;}
 
 	// WIDGET
 	private DrawStack draw_stackA;

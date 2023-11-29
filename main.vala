@@ -1,31 +1,28 @@
 //valac main.vala window.vala --pkg=gtk+-3.0
 
-bool search_path(out string? path) {
+string? search_path() {
 	print("recherche de:	 ./push_swap\n");
 	if (FileUtils.test("push_swap", FileTest.EXISTS | FileTest.IS_EXECUTABLE)) {
 		FileUtils.chmod("push_swap", 0000755);
-		path = "push_swap";
-		return true;
+		return "push_swap";
 	}
 	print("recherche de:	 ../push_swap\n");
 	if (FileUtils.test("../push_swap", FileTest.EXISTS | FileTest.IS_EXECUTABLE)) {
 		FileUtils.chmod("../push_swap", 0000755);
-		path = "../push_swap";
-		return true;
+		return "../push_swap";
 	}
 	printerr("le programme push_swap n'existe pas ou n'est pas executable.\n");
-	path = null;
-	return false;
+	return null;
 }
 
-public string PUSH_SWAP_EMP;
+public unowned string PUSH_SWAP_EMP;
 
 int	main(string []args)
 {
 	string? path;
 	int []range_nb = {};
 
-	if (search_path(out path) == false)
+	if ((path = search_path()) == null)
 		return -1;
 	PUSH_SWAP_EMP = path;
 	if (args[1] == null){
@@ -50,6 +47,7 @@ int	main(string []args)
 }
 
 public const string css_data = """
+
 #menu {
 	padding:8px;
 }
