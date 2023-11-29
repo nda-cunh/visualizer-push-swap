@@ -6,17 +6,18 @@ visualizes stack A and B for push_swap of 42
 
 ## Installation
 
-git clone it:
 ```git clone https://gitlab.com/hydrasho/visualizer-push-swap```
 
-for 42 Angouleme or if you have valac dependency :
+#### for 42 Angouleme or if you have valac dependency :
+
 ```make```
 
-Other campus or if you don't have vala compiler :
+#### Other campus or if you don't have vala compiler :
+he use C-Code instead of vala code
 
 ```make bootstrap```
 
-he use C-Code instead of vala code
+
 
 ## how use it 
 
