@@ -92,9 +92,20 @@ public class Window : Gtk.Window {
 
 	private async void run_programme(string stream) {
 		var split = stream.strip().split("\n");
-		var split_len = split.length;
+		string []tmp = {};
+		int split_len;
 		int count = 0;
 		target = 0;
+
+		var regex = /^sa$|^sb$|^ss$|^pa$|^pb$|^ra$|^rb$|^rr$|^rra$|^rrb$|^rrr$/;
+		foreach (var i in split) {
+			if (regex.match(i))
+				tmp += i;
+		}
+		split = tmp;
+		
+		split_len = split.length;
+
 		scale.set_value(0);
 		scale.set_range(0.0, (double)split_len);
 
@@ -155,12 +166,7 @@ public class Window : Gtk.Window {
 		}
 	}
 
-
-
-
-
-
-
+	
 	public bool reverse(string line)
 	{
 		switch (line)
@@ -199,7 +205,7 @@ public class Window : Gtk.Window {
 				rr(stackA, stackB);
 				break;
 			default:
-				print(@"Commentaire : $line\n");
+				warning(line);
 				return false;
 		}
 		return true;
@@ -251,7 +257,7 @@ public class Window : Gtk.Window {
 				rrr(stackA, stackB);
 				break;
 			default:
-				print(@"Commentaire : $line\n");
+				warning(line);
 				return false;
 			}
 		return true;
@@ -299,11 +305,9 @@ public class Window : Gtk.Window {
 			menu.refresh_speed();
 			switch (type) {
 				case TypeEvent.CONTINUE:
-					print("continue\n");
 					is_stop = false;
 					break;
 				case TypeEvent.NEW:
-					print("nouveau\n");
 					Idle.add(()=> {
 						loading.begin();
 						is_stop = true;
@@ -312,25 +316,20 @@ public class Window : Gtk.Window {
 					});
 					break;
 				case TypeEvent.STOP:
-					print("stop\n");
 					is_stop = true;
 					break;
 				case TypeEvent.STEP:
-					print("step\n");
 					is_stop = true;
 					is_step = true;
 					break;
 				case TypeEvent.BACKSTEP:
-					print("backstep\n");
 					is_stop = true;
 					is_backstep = true;
 					break;
 				case TypeEvent.FORWARD:
-					print("forward\n");
 					is_reverse = false;
 					break;
 				case TypeEvent.REVERSE:
-					print("reverse\n");
 					is_reverse = true;
 					break;
 			}
