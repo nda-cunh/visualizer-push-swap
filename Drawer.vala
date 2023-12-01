@@ -10,7 +10,6 @@ class DrawStack : Gtk.DrawingArea {
 	}
 
 	public bool drawing(Cairo.Context ctx) {
-		uint len = stack.get_length();
 		double		color_a;
 		double		y;
 		int G_ZOOM;
@@ -56,8 +55,7 @@ class DrawStack : Gtk.DrawingArea {
 		while(copy.get_length() != 0)
 		{
 			double item = (double)copy.pop_head();
-
-			color_a = (item / len) + 0.2;
+			color_a = (item / len_max) + 0.2;
 			ctx.set_source_rgb (color_a, 0, 0);
 			ctx.set_line_width(G_ZOOM);
 			ctx.move_to (0, y);
