@@ -28,9 +28,7 @@ class Application : Gtk.Application {
 			Application.NB_MAX = 100;
 
 		var? path = search_path();
-		if (path == null)
-			error ("Your push_swap is not found");	
-		push_swap_emp = (!)path;
+		Application.push_swap_emp = (!)path ?? "./push_swap";
 
 		app.run({args[0]});
 	}
@@ -47,7 +45,7 @@ string? search_path() {
 	print("recherche de:	 ./push_swap\n");
 	if (FileUtils.test("push_swap", FileTest.EXISTS | FileTest.IS_EXECUTABLE)) {
 		FileUtils.chmod("push_swap", 0000755);
-		return "push_swap";
+		return "./push_swap";
 	}
 	print("recherche de:	 ../push_swap\n");
 	if (FileUtils.test("../push_swap", FileTest.EXISTS | FileTest.IS_EXECUTABLE)) {

@@ -1,4 +1,4 @@
-_SRC= Utils.vala functions.vala main.vala window.vala
+_SRC= Utils.vala functions.vala DrawStack.vala main.vala window.vala
 SRC= $(addprefix src/,$(_SRC))
 CFLAGS= -O2 -flto -w
 PKG=gtk4 gee-0.8 
@@ -8,7 +8,7 @@ NAME=out
 
 all: $(NAME)
 
-$(NAME): ui/window.ui build/gresource.c 
+$(NAME): ui/window.ui build/gresource.c $(SRC)
 	valac $(SRC) $(FLAGSVALA) build/gresource.c --gresources=gresource.xml -o $(NAME)
 
 build/gresource.c : gresource.xml ui/window.ui ui/style.css
@@ -29,4 +29,4 @@ clean:
 	rm -rf build
 
 run: all
-	./$(NAME)
+	./$(NAME) 

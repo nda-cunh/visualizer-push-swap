@@ -24,6 +24,17 @@ template $MainWindow: ApplicationWindow {
 
 	// Principal Page
 	Box {
+		InfoBar warningbar{
+			message-type: warning;
+			revealed:false;
+			styles ["warningbar"]
+			Label warningbar_label{
+				hexpand:true;
+				halign: center;
+				valign: center;
+				justify: center;
+			}
+		}
 		orientation: vertical;
 
 		Box {
@@ -48,12 +59,12 @@ template $MainWindow: ApplicationWindow {
 						styles ["right"]
 					}
 				}
-				SpinButton {
+
+				SpinButton speed_button {
 					adjustment: Adjustment {
 						lower: 1.0;
-						value: 25.0;
 						step-increment: 1.0;
-						upper: 5.0;
+						upper: 7.0;
 					};
 				}
 				ToggleButton continue_stop{
@@ -68,21 +79,25 @@ template $MainWindow: ApplicationWindow {
 						Image {
 							icon-name: "pan-start-symbolic";
 						}
+						clicked => $sig_step_left();
 					}
 					Button {
 						styles ["right"]
 						Image {
 							icon-name: "pan-end-symbolic";
 						}
+						clicked => $sig_step_right();
 					}
 				}
-				Label {
-					label: "5 ra";
+				// reverse button
+				Label hit_label{
+					label: "0 ra ";
 				}
 				Button {
-					Image {
-						icon-name: "media-skip-backward-symbolic";
+					Image reverse_img{
+						icon-name: "media-skip-forward-symbolic";
 					}
+					clicked => $sig_reverse_button();
 				}
 
 				// button if you want more parameter
@@ -99,6 +114,13 @@ template $MainWindow: ApplicationWindow {
 					vexpand: true;
 					homogeneous: true;
 					orientation: vertical;
+					Entry {
+						has-frame:true;
+						placeholder-text: "Enter your value here";
+						buffer: EntryBuffer buffer_push_swap{
+							text: "push_swap_emp";
+						};
+					}
 					Label {
 						label: "Numbers:";
 						halign: start;
@@ -128,7 +150,7 @@ template $MainWindow: ApplicationWindow {
 						Entry {
 							has-frame:true;
 							placeholder-text: "Enter your value here";
-							buffer: EntryBuffer {
+							buffer: EntryBuffer buffer {
 								text: "5 21 0 3";
 							};
 						}
@@ -149,7 +171,7 @@ template $MainWindow: ApplicationWindow {
 				vexpand: true;
 			}
 		}
-		Scale{
+		Scale scale{
 		}
 	}
 	}

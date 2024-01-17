@@ -5,9 +5,11 @@
 .right {
 	border-radius: 0px 25px 25px 0px / 0px 50px 50px 0px;
 }
+
 .left {
 	border-radius: 25px 0px 0px 25px / 50px 0px 0px 50px;
 }
+
 .box_settings entry {	
 	font-size: 12px;
 }
@@ -16,13 +18,14 @@
 	padding: 0px;
 }
 
-.box-entry entry{
+.box-entry entry {
 	border-top-left-radius: 5px;
 	border-bottom-left-radius: 5px;
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;
 }
-.box-entry button{
+
+.box-entry button {
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px;
 	border-top-left-radius: 0px;
