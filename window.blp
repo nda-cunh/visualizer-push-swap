@@ -1,0 +1,101 @@
+using Gtk 4.0;
+
+template $MainWindow: ApplicationWindow {
+	default-width: 1000;
+	default-height: 600;
+	title: "Supra-Visualizer";
+
+	[titlebar]
+	HeaderBar {}
+
+	Notebook book{
+		show-tabs: false;
+	// Loading Page
+	Box {
+		Label {
+			hexpand: true;
+			vexpand: true;
+			label: "Loading ...";
+			justify: center;
+		}
+	}
+
+
+	// Principal Page
+	Box {
+		orientation: vertical;
+
+		Box {
+			orientation: horizontal;
+			hexpand: true;
+			vexpand: true;
+			Box menu{
+				name : "menu";
+				orientation: vertical;
+				spacing: 5;
+
+				Box {
+					homogeneous: true;
+					Button {	
+						label: "New";
+						clicked => $sig_new();
+						styles ["left"]
+
+					}
+					Button {
+						label: "Replay";
+						clicked => $sig_replay();
+						styles ["right"]
+					}
+				}
+				SpinButton {
+					adjustment: Adjustment {
+						lower: 0.0;
+						value: 25.0;
+						step-increment: 1.0;
+						upper: 100.0;
+					};
+				}
+				ToggleButton continue_stop{
+					label : "Stop";
+					toggled => $sig_continue_stop(continue_stop);
+				}
+				Box stepbox {
+					visible: bind continue_stop.active;
+					homogeneous: true;
+					Button {
+						styles ["left"]
+						Image {
+							icon-name: "pan-start-symbolic";
+						}
+					}
+					Button {
+						styles ["right"]
+						Image {
+							icon-name: "pan-end-symbolic";
+						}
+					}
+				}
+				Label {
+					label: "5 ra";
+				}
+				Button {
+					Image {
+						icon-name: "media-skip-backward-symbolic";
+					}
+				}
+			}
+			DrawingArea area_a {
+				hexpand: true;
+				vexpand: true;
+			}
+			DrawingArea area_b {
+				hexpand: true;
+				vexpand: true;
+			}
+		}
+		Scale{
+		}
+	}
+	}
+}

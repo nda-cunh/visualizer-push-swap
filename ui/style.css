@@ -1,0 +1,10 @@
+#menu {
+	padding:8px;
+}
+
+.right{
+	border-radius: 0px 25px 25px 0px / 0px 50px 50px 0px;
+}
+.left{
+	border-radius: 25px 0px 0px 25px / 50px 0px 0px 50px;
+}

@@ -1,34 +1,32 @@
-SRC = main.vala Window.vala Menu.vala Drawer.vala Utils.vala function.vala
-SRC_C = $(SRC:.vala=.c) 
-LIB = --pkg=gtk+-3.0 -X -O2 -X -w
-NAME = visualiser
-ARG := 100
+_SRC= Utils.vala functions.vala main.vala window.vala
+SRC= $(addprefix src/,$(_SRC))
+CFLAGS= -O2 -flto -w
+PKG=gtk4 gee-0.8 
+
+FLAGSVALA = $(addprefix --pkg=,$(PKG))  $(addprefix -X ,$(CFLAGS))
+NAME=out
 
 all: $(NAME)
 
-$(NAME) : $(SRC)
-	valac $(SRC) $(LIB) -o $(NAME)
+$(NAME): ui/window.ui build/gresource.c 
+	valac $(SRC) $(FLAGSVALA) build/gresource.c --gresources=gresource.xml -o $(NAME)
 
-prepare:
-	valac $(SRC) $(LIB) -C
-	tar -cf ccode.tar  $(SRC_C)	
+build/gresource.c : gresource.xml ui/window.ui ui/style.css
+	glib-compile-resources --generate-source gresource.xml	
+	mkdir -p build
+	mv gresource.c build/ 
 
-$(SRC_C):
-	tar -xf ccode.tar -C .
+ui/window.ui: window.blp
+	blueprint-compiler compile $< > $@
 
-bootstrap: $(SRC_C)
-	$(CC) $(SRC_C) -O2 -w `pkg-config --cflags --libs gtk+-3.0` -o $(NAME) 
+re: fclean all
 
-
-re: clean all
+fclean: clean
+	rm -rf $(NAME)
 
 clean:
-	rm -f $(NAME)
+	rm -rf ui/window.ui
+	rm -rf build
 
 run: all
-	./$(NAME) $(ARG)
-
-run2: all debug
-
-debug:
-	GTK_DEBUG=interactive ./$(NAME) $(ARG)
+	./$(NAME)
