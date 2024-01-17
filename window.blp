@@ -10,6 +10,7 @@ template $MainWindow: ApplicationWindow {
 
 	Notebook book{
 		show-tabs: false;
+		page: 0;
 	// Loading Page
 	Box {
 		Label {
@@ -27,7 +28,6 @@ template $MainWindow: ApplicationWindow {
 
 		Box {
 			orientation: horizontal;
-			hexpand: true;
 			vexpand: true;
 			Box menu{
 				name : "menu";
@@ -50,10 +50,10 @@ template $MainWindow: ApplicationWindow {
 				}
 				SpinButton {
 					adjustment: Adjustment {
-						lower: 0.0;
+						lower: 1.0;
 						value: 25.0;
 						step-increment: 1.0;
-						upper: 100.0;
+						upper: 5.0;
 					};
 				}
 				ToggleButton continue_stop{
@@ -82,6 +82,61 @@ template $MainWindow: ApplicationWindow {
 				Button {
 					Image {
 						icon-name: "media-skip-backward-symbolic";
+					}
+				}
+
+				// button if you want more parameter
+				ToggleButton more_param {
+					Label {
+						label: "More settings";
+					}
+				}
+				Box box_other_settings {
+					styles ["box_settings"]
+					visible: bind more_param.active;
+					halign: end;
+					valign: end;
+					vexpand: true;
+					homogeneous: true;
+					orientation: vertical;
+					Label {
+						label: "Numbers:";
+						halign: start;
+					}
+					SpinButton number_max {
+						adjustment: Adjustment {
+							lower: 1.0;
+							upper: 500.0;
+							step-increment: 1.0;
+							value: 25.0;
+						};
+					}
+					Label {
+						label: "another way:";
+						halign: start;
+					}
+					ToggleButton better_way{
+						label: "'5' '4' '3' '2' '1'";
+						toggled => $sig_better_way_toggle(better_way);
+					}
+					Label {
+						label: "double tap for copy";
+						halign: start;
+					}
+					Box {
+						styles ["box-entry"]
+						Entry {
+							has-frame:true;
+							placeholder-text: "Enter your value here";
+							buffer: EntryBuffer {
+								text: "5 21 0 3";
+							};
+						}
+						Button {
+							Image {
+								icon-name: "edit-copy-symbolic";
+							}
+						}
 					}
 				}
 			}
