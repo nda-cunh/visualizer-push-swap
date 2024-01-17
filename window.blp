@@ -69,7 +69,6 @@ template $MainWindow: ApplicationWindow {
 				}
 				ToggleButton continue_stop{
 					label : "Stop";
-					toggled => $sig_continue_stop(continue_stop);
 				}
 				Box stepbox {
 					visible: bind continue_stop.active;

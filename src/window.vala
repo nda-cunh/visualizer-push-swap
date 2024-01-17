@@ -33,6 +33,8 @@ public class MainWindow : Gtk.ApplicationWindow {
 			scale.set_value(b);
 			target = (int)scale.get_value();
 			is_scaling = true;
+			//TODO continue_stop active call the event and reset the bad value
+			continue_stop.active = true;
 			is_stop = false;
 			speed = 25;
 			return false;
@@ -63,6 +65,13 @@ public class MainWindow : Gtk.ApplicationWindow {
 					this.speed = 1;
 					break;
 			}
+		});
+		continue_stop.toggled.connect (()=> {
+			if (continue_stop.active == true)
+				continue_stop.label = "Continue";
+			else
+				continue_stop.label = "Stop";
+			is_scaling = false;
 		});
 
 
@@ -387,14 +396,6 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 
 	[GtkCallback]
-	public void sig_continue_stop(Gtk.ToggleButton abc) {
-		if (abc.active == true)
-			abc.label = "Continue";
-		else
-			abc.label = "Stop";
-	} 
-
-	[GtkCallback]
 	public void sig_reverse_button() {
 		is_reverse = !is_reverse;
 		if (is_reverse)
@@ -420,11 +421,10 @@ public class MainWindow : Gtk.ApplicationWindow {
 	private int target = 0;
 	public int speed = 0; 
 	private string stream;
-	private bool is_step		{get; set; default=false;}
-	private bool is_backstep	{get; set; default=false;}
-	private bool is_replay		{get; set; default=false;}
-	private bool is_running		{get; set; default=false;}
-	private bool is_reverse		{get; set; default=false;}
-	private bool is_scaling		{get; set; default=false;}
+	private bool is_step;
+	private bool is_backstep;
+	private bool is_running;
+	private bool is_reverse;
+	private bool is_scaling;
 
 }
