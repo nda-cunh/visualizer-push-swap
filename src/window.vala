@@ -73,7 +73,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 	void init_event ()  {
 		scale.change_value.connect((a, b)=> {
 			scale.set_value(b);
-			target = (int)scale.get_value() - 1;
+			target = (int)scale.get_value();
 			is_scaling = true;
 			continue_stop.active = true;
 			speed = 0;
@@ -193,7 +193,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		
 
 		scale.set_value(0);
-		scale.set_range(1.0, (double)split_len);
+		scale.set_range(0.0, (double)split_len);
 
 		print("%s\n", stream); //TODO //TODO //TODO    
 		// fill the window_dialog
@@ -202,8 +202,13 @@ public class MainWindow : Gtk.ApplicationWindow {
 			name = "dialog_box"
 		};
 		dialog_view.child = dialog_box;
-		for (var i = 0; i != split.length; i++) {
-			var tmp = new Gtk.Button.with_label(@"$(i + 1) $(split[i])");
+		for (var i = 0; i != split.length + 1; i++) {
+			Gtk.Button tmp;
+			if (i == split_len) {
+				tmp = new Gtk.Button.with_label("---");
+			}
+			else
+				tmp = new Gtk.Button.with_label(@"$(i) $(split[i])");
 			tmp.has_frame = false;
 			lst_button.append(tmp);
 			int n = i;
@@ -216,7 +221,6 @@ public class MainWindow : Gtk.ApplicationWindow {
 			dialog_box.append (tmp);
 		}
 
-
 		while (true) {
 
 			yield Utils.usleep(speed);
@@ -224,7 +228,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 			// si le programme est sur stop il doit tourner ici en boucle
 			// sauf si le programme est entrain de mourir ou que l'utilisateur utilise le scale
 			while (is_stop && is_killing == false && is_scaling == false) {
-				yield Utils.sleep(150);
+				yield Utils.sleep(350);
 			}
 
 			if (is_killing == true)
@@ -251,17 +255,26 @@ public class MainWindow : Gtk.ApplicationWindow {
 					count--;
 			}
 
-			if (target > split_len)
+			if (target >= split_len)
 				target = split_len;
-			if (count >= split_len)
+			if (count > split_len)
 				continue;
 
-			scale.set_value((double)target + 1);
-			if (count >= 0)
-				hit_label.label = @"$(split[count]) $(count + 1)";
+			scale.set_value((double)target);
 			
 			unowned var btn = lst_button.nth_data(count);
 			btn.focus(Gtk.DirectionType.DOWN);
+			print("c%d\n", count);
+			print("s%d\n", split_len);
+			if (count != split_len) {
+				if (count >= 0)
+					hit_label.label = @"$(split[count]) $(count)";
+			}
+			else {
+					hit_label.label = @"---";
+				// unowned var btn = lst_button.nth_data(count);
+				// btn.focus(Gtk.DirectionType.DOWN);
+			}
 
 			stackA.refresh();
 			stackB.refresh();
