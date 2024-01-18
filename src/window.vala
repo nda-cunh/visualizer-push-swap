@@ -126,6 +126,8 @@ public class MainWindow : Gtk.ApplicationWindow {
 			}
 			buffer.set_text(sb.str.data);
 
+			//here
+			FileUtils.chmod(push_swap_emp, 0000755);
 
 			// Run the push_swap in thread (ASync)
 			var thread = new Thread<string>(null, () => {

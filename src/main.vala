@@ -42,15 +42,11 @@ class Application : Gtk.Application {
 
 string? search_path() {
 	print("recherche de:	 ./push_swap\n");
-	if (FileUtils.test("push_swap", FileTest.EXISTS | FileTest.IS_EXECUTABLE)) {
-		FileUtils.chmod("push_swap", 0000755);
+	if (FileUtils.test("push_swap", FileTest.EXISTS | FileTest.IS_EXECUTABLE))
 		return "./push_swap";
-	}
 	print("recherche de:	 ../push_swap\n");
-	if (FileUtils.test("../push_swap", FileTest.EXISTS | FileTest.IS_EXECUTABLE)) {
-		FileUtils.chmod("../push_swap", 0000755);
+	if (FileUtils.test("../push_swap", FileTest.EXISTS | FileTest.IS_EXECUTABLE))
 		return "../push_swap";
-	}
 	printerr("le programme push_swap n'existe pas ou n'est pas executable.\n");
 	return null;
 }
