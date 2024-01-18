@@ -59,7 +59,7 @@ class DrawStack {
 		}
 		else if (len_max <= 520) {
 			G_ZOOM = 1;
-			G_SIZE = 0.7;
+			G_SIZE = 1.0;
 		}
 		else{
 			G_ZOOM = 1;

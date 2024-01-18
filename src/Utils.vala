@@ -11,7 +11,7 @@ namespace Utils{
 			});
 		}
 		else
-			Idle.add(usleep.callback);
+			Idle.add(usleep.callback, Priority.HIGH_IDLE);
 		yield;
 	}
 

@@ -238,22 +238,27 @@ public class MainWindow : Gtk.ApplicationWindow {
 			if (is_scaling == false) {
 				if (is_reverse) {
 					if (target > 0)
-						target--;
+						--target;
 				}
 				else if (target < split_len)
-					target++;
+					++target;
 			}
 
 			if (target > count) {
 				if (count < split_len) {
 					if (forward(split[count], stackA.stack, stackB.stack))
-						count++;
+						++count;
 				}
 			}
 			else if (target < count) {
 				if (reverse(split[count - 1], stackA.stack, stackB.stack))
-					count--;
+					--count;
 			}
+			
+			if (count == target)
+				is_scaling = false;
+			if (is_scaling == true)
+				continue;
 
 			if (target >= split_len)
 				target = split_len;
@@ -261,19 +266,13 @@ public class MainWindow : Gtk.ApplicationWindow {
 				continue;
 
 			scale.set_value((double)target);
-			
-			unowned var btn = lst_button.nth_data(count);
-			btn.focus(Gtk.DirectionType.DOWN);
-			print("c%d\n", count);
-			print("s%d\n", split_len);
+			lst_button.nth_data(count).focus(Gtk.DirectionType.DOWN);
 			if (count != split_len) {
 				if (count >= 0)
 					hit_label.label = @"$(split[count]) $(count)";
 			}
 			else {
-					hit_label.label = @"---";
-				// unowned var btn = lst_button.nth_data(count);
-				// btn.focus(Gtk.DirectionType.DOWN);
+				hit_label.label = @"---";
 			}
 
 			stackA.refresh();

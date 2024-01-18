@@ -1,6 +1,6 @@
 _SRC= window_program.vala Utils.vala functions.vala DrawStack.vala main.vala window.vala
 SRC= $(addprefix src/,$(_SRC))
-CFLAGS= -O2 -flto -w
+CFLAGS= -Ofast -flto -w
 PKG=gtk4 gee-0.8 
 FLAGS=--enable-experimental
 
