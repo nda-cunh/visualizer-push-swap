@@ -13,6 +13,11 @@ public void gtk_warn (Gtk.InfoBar bar, Gtk.Label bar_label, string txt) {
 	});
 }
 
+// [GtkTemplate (ui = "/ui/window.ui")]
+// public class dialog_win: Gtk.Window {
+// 
+// }
+
 [GtkTemplate (ui = "/ui/window.ui")]
 public class MainWindow : Gtk.ApplicationWindow {
 
@@ -68,7 +73,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 	void init_event ()  {
 		scale.change_value.connect((a, b)=> {
 			scale.set_value(b);
-			target = (int)scale.get_value();
+			target = (int)scale.get_value() - 1;
 			is_scaling = true;
 			continue_stop.active = true;
 			speed = 0;
@@ -170,23 +175,47 @@ public class MainWindow : Gtk.ApplicationWindow {
 	// Lit le stream du push_swap  (sa\n pa\n ra\n  ...)
 	async void run_programme(string stream) {
 		var split = stream.strip().split("\n");
-		string []tmp = {};
 		int split_len;
 		int count = 0;
 		target = 0;
 
-		var regex = /^sa$|^sb$|^ss$|^pa$|^pb$|^ra$|^rb$|^rr$|^rra$|^rrb$|^rrr$/;
-		foreach (var i in split) {
-			if (regex.match(i))
-				tmp += i;
+		{
+			string []tmp = {};
+			var regex = /^sa$|^sb$|^ss$|^pa$|^pb$|^ra$|^rb$|^rr$|^rra$|^rrb$|^rrr$/;
+			foreach (var i in split) {
+				if (regex.match(i))
+					tmp += i;
+			}
+			hit_label.label = "---";
+			split = tmp;
+			split_len = split.length;
 		}
-		hit_label.label = "---";
-		split = tmp;
-		split_len = split.length;
 		
 
 		scale.set_value(0);
-		scale.set_range(0.0, (double)split_len);
+		scale.set_range(1.0, (double)split_len);
+
+		print("%s\n", stream); //TODO //TODO //TODO    
+		// fill the window_dialog
+		var lst_button = new List<Gtk.Button>();
+		dialog_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0) {
+			name = "dialog_box"
+		};
+		dialog_view.child = dialog_box;
+		for (var i = 0; i != split.length; i++) {
+			var tmp = new Gtk.Button.with_label(@"$(i + 1) $(split[i])");
+			tmp.has_frame = false;
+			lst_button.append(tmp);
+			int n = i;
+			tmp.clicked.connect(()=> {
+				target = n;
+				is_scaling = true;
+				continue_stop.active = true;
+				speed = 0;
+			});
+			dialog_box.append (tmp);
+		}
+
 
 		while (true) {
 
@@ -222,9 +251,17 @@ public class MainWindow : Gtk.ApplicationWindow {
 					count--;
 			}
 
-			scale.set_value((double)target);
-			if (count != 0)
-				hit_label.label = @"$(split[count - 1]) $count";
+			if (target > split_len)
+				target = split_len;
+			if (count >= split_len)
+				continue;
+
+			scale.set_value((double)target + 1);
+			if (count >= 0)
+				hit_label.label = @"$(split[count]) $(count + 1)";
+			
+			unowned var btn = lst_button.nth_data(count);
+			btn.focus(Gtk.DirectionType.DOWN);
 
 			stackA.refresh();
 			stackB.refresh();
@@ -266,6 +303,9 @@ public class MainWindow : Gtk.ApplicationWindow {
 	unowned Gtk.Image reverse_img; 
 	[GtkChild]
 	unowned Gtk.SpinButton speed_button; 
+	Gtk.Box dialog_box; 
+	[GtkChild]
+	unowned Gtk.Viewport dialog_view; 
 
 	public string push_swap_emp {get {return buffer_push_swap.text;} set {buffer_push_swap.set_text(value.data);}}
 	public int nb_max { get {return (int)number_max.value;} set {number_max.value =(double)value;}}

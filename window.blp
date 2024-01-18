@@ -1,8 +1,8 @@
 using Gtk 4.0;
 
 template $MainWindow: ApplicationWindow {
-	default-width: 1000;
-	default-height: 600;
+	default-width: 1100;
+	default-height: 700;
 	title: "Supra-Visualizer";
 
 	[titlebar]
@@ -90,7 +90,7 @@ template $MainWindow: ApplicationWindow {
 				}
 				// reverse button
 				Label hit_label{
-					label: "0 ra ";
+					label: "---";
 				}
 				Button {
 					Image reverse_img{
@@ -119,6 +119,10 @@ template $MainWindow: ApplicationWindow {
 						buffer: EntryBuffer buffer_push_swap{
 							text: "push_swap_emp";
 						};
+					}
+					ToggleButton window_list_btn{
+						label: "Window List";
+						active: true;
 					}
 					Label {
 						label: "Numbers:";
@@ -168,6 +172,16 @@ template $MainWindow: ApplicationWindow {
 			DrawingArea area_b {
 				hexpand: true;
 				vexpand: true;
+			}
+			ScrolledWindow {
+				visible: bind window_list_btn.active;
+				kinetic-scrolling: true;
+				overlay-scrolling: true;
+				min-content-height: 300;
+				min-content-width: 100;
+			Viewport dialog_view {
+				scroll-to-focus:true;
+			}
 			}
 		}
 		Scale scale{

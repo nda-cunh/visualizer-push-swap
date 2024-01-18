@@ -7,8 +7,8 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
 <interface>
   <requires lib="gtk" version="4.0"/>
   <template class="MainWindow" parent="GtkApplicationWindow">
-    <property name="default-width">1000</property>
-    <property name="default-height">600</property>
+    <property name="default-width">1100</property>
+    <property name="default-height">700</property>
     <property name="title">Supra-Visualizer</property>
     <child type="titlebar">
       <object class="GtkHeaderBar"></object>
@@ -131,7 +131,7 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                     </child>
                     <child>
                       <object class="GtkLabel" id="hit_label">
-                        <property name="label">0 ra </property>
+                        <property name="label">---</property>
                       </object>
                     </child>
                     <child>
@@ -173,6 +173,12 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                                 <property name="text">push_swap_emp</property>
                               </object>
                             </property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkToggleButton" id="window_list_btn">
+                            <property name="label">Window List</property>
+                            <property name="active">true</property>
                           </object>
                         </child>
                         <child>
@@ -252,6 +258,20 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                   <object class="GtkDrawingArea" id="area_b">
                     <property name="hexpand">true</property>
                     <property name="vexpand">true</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkScrolledWindow">
+                    <property name="visible" bind-source="window_list_btn" bind-property="active" bind-flags="sync-create"/>
+                    <property name="kinetic-scrolling">true</property>
+                    <property name="overlay-scrolling">true</property>
+                    <property name="min-content-height">300</property>
+                    <property name="min-content-width">100</property>
+                    <child>
+                      <object class="GtkViewport" id="dialog_view">
+                        <property name="scroll-to-focus">true</property>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>
