@@ -5,7 +5,7 @@ PKG=gtk4 gee-0.8
 FLAGS=--enable-experimental
 
 FLAGSVALA = $(addprefix --pkg=,$(PKG))  $(addprefix -X ,$(CFLAGS)) $(FLAGS) 
-NAME=out
+NAME=visualizer
 
 all: $(NAME)
 
