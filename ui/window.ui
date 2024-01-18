@@ -257,7 +257,10 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
               </object>
             </child>
             <child>
-              <object class="GtkScale" id="scale"></object>
+              <object class="GtkScale" id="scale">
+                <property name="draw-value">true</property>
+                <property name="digits">0</property>
+              </object>
             </child>
           </object>
         </child>
