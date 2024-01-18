@@ -21,6 +21,33 @@ public class MainWindow : Gtk.ApplicationWindow {
 	DrawStack stackB;
 
 
+	void change_speed () {
+		var _speed = (int)speed_button.value;
+		switch (_speed) {
+			case 1:
+				this.speed = 40000;
+				break;
+			case 2:
+				this.speed = 25000;
+				break;
+			case 3:
+				this.speed = 5000;
+				break;
+			case 4:
+				this.speed = 2500;
+				break;
+			case 5:
+				this.speed = 500;
+				break;
+			case 6:
+				this.speed = 150;
+				break;
+			case 7:
+				this.speed = 1;
+				break;
+		}
+	}
+
 	public MainWindow(Gtk.Application app) {
 		Object(application: app);
 		stream = "";
@@ -33,47 +60,26 @@ public class MainWindow : Gtk.ApplicationWindow {
 			scale.set_value(b);
 			target = (int)scale.get_value();
 			is_scaling = true;
-			//TODO continue_stop active call the event and reset the bad value
 			continue_stop.active = true;
-			is_stop = false;
 			speed = 25;
 			return false;
 		});
 		
 		speed_button.value_changed.connect(() => {
-			var _speed = (int)speed_button.value;
-			switch (_speed) {
-				case 1:
-					this.speed = 40000;
-					break;
-				case 2:
-					this.speed = 25000;
-					break;
-				case 3:
-					this.speed = 5000;
-					break;
-				case 4:
-					this.speed = 2500;
-					break;
-				case 5:
-					this.speed = 500;
-					break;
-				case 6:
-					this.speed = 150;
-					break;
-				case 7:
-					this.speed = 1;
-					break;
-			}
-		});
-		continue_stop.toggled.connect (()=> {
-			if (continue_stop.active == true)
-				continue_stop.label = "Continue";
-			else
-				continue_stop.label = "Stop";
-			is_scaling = false;
+				change_speed();
 		});
 
+		continue_stop.toggled.connect(()=> {
+			if (continue_stop.active == true) {
+				continue_stop.label = "Continue";
+			}
+			else {
+				continue_stop.label = "Stop";
+				is_scaling = false;
+				change_speed();
+			}
+			is_stop = continue_stop.active;
+		});
 
 		book.page = 1;
 	}
@@ -173,7 +179,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 			yield Utils.usleep(speed);
 
-			while (is_stop && is_killing == false) {
+			while (is_stop && is_killing == false && is_scaling == false) {
 				yield Utils.sleep(200);
 				if (is_step == true) {
 					is_step = false;
@@ -216,6 +222,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 					count--;
 			}
 
+			print("A\n");
 			scale.set_value((double)target);
 			if (count == 0)
 				hit_label.label = @"0 $count";
@@ -370,19 +377,18 @@ public class MainWindow : Gtk.ApplicationWindow {
 	public void sig_step_left() {
 		is_backstep = true;
 	}
+
 	[GtkCallback]
 	public void sig_step_right() {
 		is_step = true;
 	}
 	[GtkCallback]
 	public void sig_new () {
-		print ("Nouveau\n");
 		run_push_swap.begin(NEW);
 	} 
 
 	[GtkCallback]
 	public void sig_replay() {
-		print ("Replay\n");
 		run_push_swap.begin(REPLAY);
 	} 
 	
@@ -393,6 +399,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		else
 			button.label = "'5' '4' '3' '2' '1'";
 	} 
+
 
 
 	[GtkCallback]
@@ -408,23 +415,16 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 
 	private bool is_killing		{get; set; default=false;}
-	private bool is_stop		{get {return continue_stop.active; }
-		set {
-			if (value == true) 
-				continue_stop.label = "Continue";
-			else
-				continue_stop.label = "Continue";
-			continue_stop.active = value;
-		}
-	}
+	private bool is_stop		{get; set;}
 
 	private int target = 0;
 	public int speed = 0; 
 	private string stream;
-	private bool is_step;
-	private bool is_backstep;
-	private bool is_running;
-	private bool is_reverse;
-	private bool is_scaling;
+	private bool is_step		{get; set; default=false;}
+	private bool is_backstep	{get; set; default=false;}
+	private bool is_replay		{get; set; default=false;}
+	private bool is_running		{get; set; default=false;}
+	private bool is_reverse		{get; set; default=false;}
+	private bool is_scaling		{get; set; default=false;}
 
 }
