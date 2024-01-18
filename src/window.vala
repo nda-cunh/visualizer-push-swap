@@ -213,12 +213,12 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 			if (target > count) {
 				if (count < split_len) {
-					if (forward(split[count]))
+					if (forward(split[count], stackA.stack, stackB.stack))
 						count++;
 				}
 			}
 			else if (target < count) {
-				if (reverse(split[count - 1]))
+				if (reverse(split[count - 1], stackA.stack, stackB.stack))
 					count--;
 			}
 
@@ -231,102 +231,6 @@ public class MainWindow : Gtk.ApplicationWindow {
 		}
 	}
 
-
-	public bool reverse(string line)
-	{
-		switch (line)
-		{
-			case "ra":
-				rra(stackA.stack);
-				break;
-			case "rra":
-				ra(stackA.stack);
-				break;
-			case "sa":
-				sa(stackA.stack);
-				break;
-			case "pa":
-				pb(stackA.stack, stackB.stack);
-				break;
-			case "rb":
-				rrb(stackB.stack);
-				break;
-			case "rrb":
-				rb(stackB.stack);
-				break;
-			case "sb":
-				sb(stackB.stack);
-				break;
-			case "pb":
-				pa(stackA.stack, stackB.stack);
-				break;
-			case "ss":
-				ss(stackA.stack, stackB.stack);
-				break;
-			case "rr":
-				rrr(stackA.stack, stackB.stack);
-				break;
-			case "rrr":
-				rr(stackA.stack, stackB.stack);
-				break;
-			default:
-				warning(line);
-				return false;
-		}
-		return true;
-	}
-
-
-
-
-
-
-
-
-
-
-	public bool forward (string line)
-	{
-		switch (line) {
-			case "ra":
-				ra(stackA.stack);
-				break;
-			case "rra":
-				rra(stackA.stack);
-				break;
-			case "sa":
-				sa(stackA.stack);
-				break;
-			case "pa":
-				pa(stackA.stack, stackB.stack);
-				break;
-			case "rb":
-				rb(stackB.stack);
-				break;
-			case "rrb":
-				rrb(stackB.stack);
-				break;
-			case "sb":
-				sb(stackB.stack);
-				break;
-			case "pb":
-				pb(stackA.stack, stackB.stack);
-				break;
-			case "ss":
-				ss(stackA.stack, stackB.stack);
-				break;
-			case "rr":
-				rr(stackA.stack, stackB.stack);
-				break;
-			case "rrr":
-				rrr(stackA.stack, stackB.stack);
-				break;
-			default:
-				warning(line);
-				return false;
-			}
-		return true;
-	}
 
 
 

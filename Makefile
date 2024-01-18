@@ -1,9 +1,10 @@
-_SRC= Utils.vala functions.vala DrawStack.vala main.vala window.vala
+_SRC= window_program.vala Utils.vala functions.vala DrawStack.vala main.vala window.vala
 SRC= $(addprefix src/,$(_SRC))
 CFLAGS= -O2 -flto -w
 PKG=gtk4 gee-0.8 
+FLAGS=--enable-experimental
 
-FLAGSVALA = $(addprefix --pkg=,$(PKG))  $(addprefix -X ,$(CFLAGS))
+FLAGSVALA = $(addprefix --pkg=,$(PKG))  $(addprefix -X ,$(CFLAGS)) $(FLAGS) 
 NAME=out
 
 all: $(NAME)
@@ -29,4 +30,4 @@ clean:
 	rm -rf build
 
 run: all
-	./$(NAME) 
+	./$(NAME) 50 
