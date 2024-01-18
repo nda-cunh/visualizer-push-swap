@@ -25,43 +25,53 @@ public class MainWindow : Gtk.ApplicationWindow {
 		var _speed = (int)speed_button.value;
 		switch (_speed) {
 			case 1:
-				this.speed = 40000;
+				this.speed = 200000;
 				break;
 			case 2:
-				this.speed = 25000;
+				this.speed = 40001;
 				break;
 			case 3:
-				this.speed = 5000;
+				this.speed = 25001;
 				break;
 			case 4:
-				this.speed = 2500;
+				this.speed = 5001;
 				break;
 			case 5:
-				this.speed = 500;
+				this.speed = 2501;
 				break;
 			case 6:
-				this.speed = 150;
+				this.speed = 501;
 				break;
 			case 7:
-				this.speed = 1;
+				this.speed = 151;
+				break;
+			case 8:
+				this.speed = 2;
 				break;
 		}
 	}
 
 	public MainWindow(Gtk.Application app) {
 		Object(application: app);
-		stream = "";
+		init_event();
 
 		stackA = new DrawStack(area_a, A);
 		stackB = new DrawStack(area_b, B);
 
+		speed_button.value = 3;
+		stream = "";
 
+		book.page = 1;
+	}
+
+
+	void init_event ()  {
 		scale.change_value.connect((a, b)=> {
 			scale.set_value(b);
 			target = (int)scale.get_value();
 			is_scaling = true;
 			continue_stop.active = true;
-			speed = 25;
+			speed = 0;
 			return false;
 		});
 		
@@ -80,12 +90,6 @@ public class MainWindow : Gtk.ApplicationWindow {
 			}
 			is_stop = continue_stop.active;
 		});
-
-		book.page = 1;
-	}
-
-	public void run() {
-
 	}
 
 	async void run_push_swap (runMode mode) {
@@ -106,28 +110,30 @@ public class MainWindow : Gtk.ApplicationWindow {
 		book.page = 0;
 
 		if (mode == NEW) {
+			// Generate some random number is is a `new` test
 			var lst = Utils.get_random_tab(nb_max);
 			var sb = new StringBuilder.sized(nb_max * 5);
+
 			if (better_way.active == true) {
 				sb.append_c('"');
-				foreach (var i in lst) {
+				foreach (var i in lst)
 					sb.append_printf("%d ", i);
-				}
 				sb.append_c('"');
 			}
 			else {
-				foreach (var i in lst) {
+				foreach (var i in lst)
 					sb.append_printf("\"%d\" ", i);
-				}
 			}
 			buffer.set_text(sb.str.data);
-			int wait_status = 0;
+
+
+			// Run the push_swap in thread (ASync)
 			var thread = new Thread<string>(null, () => {
-					string stdout;
+				string stdout;
 				try {
-					Process.spawn_command_line_sync(@"$(push_swap_emp) $(buffer.get_text())", out stdout, null, out wait_status);
+					Process.spawn_command_line_sync(@"$(push_swap_emp) $(buffer.get_text())", out stdout, null);
 				} catch (Error e) {
-					printerr(e.message);
+					warning(e.message);
 				} 
 				Idle.add(run_push_swap.callback);
 				return stdout;
@@ -153,9 +159,13 @@ public class MainWindow : Gtk.ApplicationWindow {
 			stackA.stack.push_tail(int.parse(i));
 		}
 
-		run_programme.begin(stream);
+		run_programme.begin(stream, ()=> {
+			is_killing = false;
+		});
 	}
 
+
+	// Lit le stream du push_swap  (sa\n pa\n ra\n  ...)
 	async void run_programme(string stream) {
 		var split = stream.strip().split("\n");
 		string []tmp = {};
@@ -168,9 +178,10 @@ public class MainWindow : Gtk.ApplicationWindow {
 			if (regex.match(i))
 				tmp += i;
 		}
+		hit_label.label = "---";
 		split = tmp;
-		
 		split_len = split.length;
+		
 
 		scale.set_value(0);
 		scale.set_range(0.0, (double)split_len);
@@ -179,30 +190,17 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 			yield Utils.usleep(speed);
 
+			// si le programme est sur stop il doit tourner ici en boucle
+			// sauf si le programme est entrain de mourir ou que l'utilisateur utilise le scale
 			while (is_stop && is_killing == false && is_scaling == false) {
-				yield Utils.sleep(200);
-				if (is_step == true) {
-					is_step = false;
-					if (target < split_len)
-						target++;
-					break;
-				}
-				if (is_backstep == true) {
-					is_backstep = false;
-					if (target > 0)
-						target--;
-					break;
-				}
+				yield Utils.sleep(150);
 			}
 
-			// Loading Kill infinit loop
-			if (is_killing == true) {
-				is_killing = false;
+			if (is_killing == true)
 				return ;
-			}
 
 
-			if (is_stop == false && is_scaling == false) {
+			if (is_scaling == false) {
 				if (is_reverse) {
 					if (target > 0)
 						target--;
@@ -222,18 +220,16 @@ public class MainWindow : Gtk.ApplicationWindow {
 					count--;
 			}
 
-			print("A\n");
 			scale.set_value((double)target);
-			if (count == 0)
-				hit_label.label = @"0 $count";
-			else
+			if (count != 0)
 				hit_label.label = @"$(split[count - 1]) $count";
+
 			stackA.refresh();
 			stackB.refresh();
 		}
 	}
 
-	
+
 	public bool reverse(string line)
 	{
 		switch (line)
@@ -375,12 +371,15 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 	[GtkCallback]
 	public void sig_step_left() {
-		is_backstep = true;
+		if (target != 0)
+			target--;
+		is_scaling = true;
 	}
 
 	[GtkCallback]
 	public void sig_step_right() {
-		is_step = true;
+		target++;
+		is_scaling = true;
 	}
 	[GtkCallback]
 	public void sig_new () {
@@ -420,8 +419,6 @@ public class MainWindow : Gtk.ApplicationWindow {
 	private int target = 0;
 	public int speed = 0; 
 	private string stream;
-	private bool is_step		{get; set; default=false;}
-	private bool is_backstep	{get; set; default=false;}
 	private bool is_replay		{get; set; default=false;}
 	private bool is_running		{get; set; default=false;}
 	private bool is_reverse		{get; set; default=false;}

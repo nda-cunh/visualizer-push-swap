@@ -75,6 +75,10 @@ class DrawStack {
 			double item = (double)copy.pop_head();
 			color_a = (item / len_max) + 0.2;
 			ctx.set_source_rgb (color_a, 0, 0);
+			if (item == 0) {
+				item = 50;
+				ctx.set_source_rgb (0, 1.0, 1.0);
+			}
 			ctx.set_line_width(G_ZOOM);
 			ctx.move_to (0, y);
 			ctx.line_to (item * G_SIZE, y);

@@ -13,7 +13,6 @@ class Application : Gtk.Application {
 		win.main_param = Application.main_param;
 		win.push_swap_emp = Application.push_swap_emp;
 		win.nb_max = Application.NB_MAX;
-		win.run ();
 		win.present();
 	}
 
