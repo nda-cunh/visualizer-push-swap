@@ -2,7 +2,7 @@ using Gtk 4.0;
 
 template $MainWindow: ApplicationWindow {
 	default-width: 1200;
-	default-height: 700;
+	default-height: 750;
 	title: "Supra-Visualizer";
 
 	[titlebar]
@@ -13,6 +13,7 @@ template $MainWindow: ApplicationWindow {
 		page: 0;
 	// Loading Page
 	Box {
+		orientation: vertical;
 		Label {
 			hexpand: true;
 			vexpand: true;
@@ -54,7 +55,7 @@ template $MainWindow: ApplicationWindow {
 
 					}
 					Button {
-						label: "Replay";
+						label: "Run";
 						clicked => $sig_replay();
 						styles ["right"]
 					}
@@ -99,20 +100,21 @@ template $MainWindow: ApplicationWindow {
 					clicked => $sig_reverse_button();
 				}
 
-				// button if you want more parameter
-				ToggleButton more_param {
-					Label {
-						label: "More settings";
-					}
-				}
 				Box box_other_settings {
 					styles ["box_settings"]
-					visible: bind more_param.active;
+					visible: true;
 					halign: end;
 					valign: end;
 					vexpand: true;
 					homogeneous: true;
 					orientation: vertical;
+
+			// Global Settings
+					Label {
+						label: "<b>Global Setting</b>";
+						use-markup:true;
+						halign: start;
+					}
 					Entry {
 						has-frame:true;
 						placeholder-text: "Enter your value here";
@@ -120,46 +122,55 @@ template $MainWindow: ApplicationWindow {
 							text: "push_swap_emp";
 						};
 					}
-					ToggleButton window_list_btn{
-						label: "Window List";
-						active: true;
+
+			// [New] Settings
+
+					Label {
+						label: "<b>[New] Setting</b>";
+						use-markup:true;
+						halign: start;
 					}
 					Label {
-						label: "Numbers:";
+						label: "Numbers to generate:";
 						halign: start;
 					}
 					SpinButton number_max {
 						adjustment: Adjustment {
 							lower: 1.0;
-							upper: 500.0;
+							upper: 800.0;
 							step-increment: 1.0;
 							value: 25.0;
 						};
 					}
 					Label {
-						label: "another way:";
+						label: "how generate numbers:";
 						halign: start;
 					}
 					ToggleButton better_way{
+						tooltip-text : "define how NEW will generate the numbers such as:\npush_swap \"5 4 3 2 1\"\nor\npush_swap \"5\" \"4\" \"3\" \"2\" \"1\"";
 						label: "'5' '4' '3' '2' '1'";
 						toggled => $sig_better_way_toggle(better_way);
 					}
+			
+			// [Run] Settings
 					Label {
-						label: "double tap for copy";
+						label: "<b>[Run] Setting</b>";
+						use-markup:true;
 						halign: start;
 					}
 					Box {
-						styles ["box-entry"]
-						Entry {
-							has-frame:true;
-							placeholder-text: "Enter your value here";
-							buffer: EntryBuffer buffer {
-								text: "5 21 0 3";
-							};
-						}
-						Button {
-							Image {
-								icon-name: "edit-copy-symbolic";
+						vexpand:true;
+						homogeneous:true;
+						tooltip-text : "\nEnter your text here and [Run] the program";
+
+						Frame {
+							Text text-view{
+								name : "text-view";
+								halign:center;
+								editable: true;
+								buffer: EntryBuffer buffer {
+									text: "9 8 5 2 1 4";
+								};
 							}
 						}
 					}
@@ -173,15 +184,27 @@ template $MainWindow: ApplicationWindow {
 				hexpand: true;
 				vexpand: true;
 			}
-			ScrolledWindow {
-				visible: bind window_list_btn.active;
-				kinetic-scrolling: true;
-				overlay-scrolling: true;
-				min-content-height: 300;
-				min-content-width: 100;
-			Viewport dialog_view {
-				scroll-to-focus:true;
-			}
+			Box {
+				orientation: vertical;
+				vexpand:true;
+				ToggleButton hide {
+					Image hide_img {
+						icon-name: "go-previous-symbolic";
+					}
+					active: true;
+					toggled => $sig_hide_img (hide);
+				}
+				ScrolledWindow {
+					vexpand:true;
+					visible: bind hide.active;
+					kinetic-scrolling: true;
+					overlay-scrolling: true;
+					min-content-height: 300;
+					min-content-width: 100;
+					Viewport dialog_view {
+						scroll-to-focus:true;
+					}
+				}
 			}
 		}
 		Scale scale{

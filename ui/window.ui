@@ -8,7 +8,7 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
   <requires lib="gtk" version="4.0"/>
   <template class="MainWindow" parent="GtkApplicationWindow">
     <property name="default-width">1200</property>
-    <property name="default-height">700</property>
+    <property name="default-height">750</property>
     <property name="title">Supra-Visualizer</property>
     <child type="titlebar">
       <object class="GtkHeaderBar"></object>
@@ -19,6 +19,7 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
         <property name="page">0</property>
         <child>
           <object class="GtkBox">
+            <property name="orientation">1</property>
             <child>
               <object class="GtkLabel">
                 <property name="hexpand">true</property>
@@ -72,20 +73,13 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                         </child>
                         <child>
                           <object class="GtkButton">
-                            <property name="label">Replay</property>
+                            <property name="label">Run</property>
                             <signal name="clicked" handler="sig_replay"/>
                             <style>
                               <class name="right"/>
                             </style>
                           </object>
                         </child>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="halign">1</property>
-                        <property name="valign">1</property>
-                        <property name="label">speed:</property>
                       </object>
                     </child>
                     <child>
@@ -152,25 +146,23 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                       </object>
                     </child>
                     <child>
-                      <object class="GtkToggleButton" id="more_param">
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="label">More settings</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                    <child>
                       <object class="GtkBox" id="box_other_settings">
                         <style>
                           <class name="box_settings"/>
                         </style>
-                        <property name="visible" bind-source="more_param" bind-property="active" bind-flags="sync-create"/>
+                        <property name="visible">true</property>
                         <property name="halign">2</property>
                         <property name="valign">2</property>
                         <property name="vexpand">true</property>
                         <property name="homogeneous">true</property>
                         <property name="orientation">1</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">&lt;b&gt;Global Setting&lt;/b&gt;</property>
+                            <property name="use-markup">true</property>
+                            <property name="halign">1</property>
+                          </object>
+                        </child>
                         <child>
                           <object class="GtkEntry">
                             <property name="has-frame">true</property>
@@ -183,14 +175,15 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                           </object>
                         </child>
                         <child>
-                          <object class="GtkToggleButton" id="window_list_btn">
-                            <property name="label">Window List</property>
-                            <property name="active">true</property>
+                          <object class="GtkLabel">
+                            <property name="label">&lt;b&gt;[New] Setting&lt;/b&gt;</property>
+                            <property name="use-markup">true</property>
+                            <property name="halign">1</property>
                           </object>
                         </child>
                         <child>
                           <object class="GtkLabel">
-                            <property name="label">Numbers:</property>
+                            <property name="label">Numbers to generate:</property>
                             <property name="halign">1</property>
                           </object>
                         </child>
@@ -199,7 +192,7 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                             <property name="adjustment">
                               <object class="GtkAdjustment">
                                 <property name="lower">1</property>
-                                <property name="upper">500</property>
+                                <property name="upper">800</property>
                                 <property name="step-increment">1</property>
                                 <property name="value">25</property>
                               </object>
@@ -208,43 +201,45 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                         </child>
                         <child>
                           <object class="GtkLabel">
-                            <property name="label">another way:</property>
+                            <property name="label">how generate numbers:</property>
                             <property name="halign">1</property>
                           </object>
                         </child>
                         <child>
                           <object class="GtkToggleButton" id="better_way">
+                            <property name="tooltip-text">define how NEW will generate the numbers such as:
+push_swap "5 4 3 2 1"
+or
+push_swap "5" "4" "3" "2" "1"</property>
                             <property name="label">'5' '4' '3' '2' '1'</property>
                             <signal name="toggled" handler="sig_better_way_toggle" object="better_way"/>
                           </object>
                         </child>
                         <child>
                           <object class="GtkLabel">
-                            <property name="label">double tap for copy</property>
+                            <property name="label">&lt;b&gt;[Run] Setting&lt;/b&gt;</property>
+                            <property name="use-markup">true</property>
                             <property name="halign">1</property>
                           </object>
                         </child>
                         <child>
                           <object class="GtkBox">
-                            <style>
-                              <class name="box-entry"/>
-                            </style>
+                            <property name="vexpand">true</property>
+                            <property name="homogeneous">true</property>
+                            <property name="tooltip-text">
+Enter your text here and [Run] the program</property>
                             <child>
-                              <object class="GtkEntry">
-                                <property name="has-frame">true</property>
-                                <property name="placeholder-text">Enter your value here</property>
-                                <property name="buffer">
-                                  <object class="GtkEntryBuffer" id="buffer">
-                                    <property name="text">5 21 0 3</property>
-                                  </object>
-                                </property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkButton">
+                              <object class="GtkFrame">
                                 <child>
-                                  <object class="GtkImage">
-                                    <property name="icon-name">edit-copy-symbolic</property>
+                                  <object class="GtkText" id="text-view">
+                                    <property name="name">text-view</property>
+                                    <property name="halign">3</property>
+                                    <property name="editable">true</property>
+                                    <property name="buffer">
+                                      <object class="GtkEntryBuffer" id="buffer">
+                                        <property name="text">9 8 5 2 1 4</property>
+                                      </object>
+                                    </property>
                                   </object>
                                 </child>
                               </object>
@@ -268,15 +263,33 @@ corresponding .blp file and regenerate this file with blueprint-compiler.
                   </object>
                 </child>
                 <child>
-                  <object class="GtkScrolledWindow">
-                    <property name="visible" bind-source="window_list_btn" bind-property="active" bind-flags="sync-create"/>
-                    <property name="kinetic-scrolling">true</property>
-                    <property name="overlay-scrolling">true</property>
-                    <property name="min-content-height">300</property>
-                    <property name="min-content-width">100</property>
+                  <object class="GtkBox">
+                    <property name="orientation">1</property>
+                    <property name="vexpand">true</property>
                     <child>
-                      <object class="GtkViewport" id="dialog_view">
-                        <property name="scroll-to-focus">true</property>
+                      <object class="GtkToggleButton" id="hide">
+                        <child>
+                          <object class="GtkImage" id="hide_img">
+                            <property name="icon-name">go-previous-symbolic</property>
+                          </object>
+                        </child>
+                        <property name="active">true</property>
+                        <signal name="toggled" handler="sig_hide_img" object="hide"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkScrolledWindow">
+                        <property name="vexpand">true</property>
+                        <property name="visible" bind-source="hide" bind-property="active" bind-flags="sync-create"/>
+                        <property name="kinetic-scrolling">true</property>
+                        <property name="overlay-scrolling">true</property>
+                        <property name="min-content-height">300</property>
+                        <property name="min-content-width">100</property>
+                        <child>
+                          <object class="GtkViewport" id="dialog_view">
+                            <property name="scroll-to-focus">true</property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>

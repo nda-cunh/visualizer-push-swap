@@ -18,20 +18,14 @@
 	padding: 0px;
 }
 
-.box-entry entry {
-	border-top-left-radius: 5px;
-	border-bottom-left-radius: 5px;
-	border-top-right-radius: 0px;
-	border-bottom-right-radius: 0px;
-}
-
-.box-entry button {
-	border-top-right-radius: 5px;
-	border-bottom-right-radius: 5px;
-	border-top-left-radius: 0px;
-	border-bottom-left-radius: 0px;
+.frame-text {
+	border-radius: 0px;
 }
 
 #dialog_box button:focus {
    background-color: red;
+}
+
+* selection {
+	background-color: #881111;
 }

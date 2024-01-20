@@ -1,6 +1,6 @@
 public enum runMode {
 	NEW,
-	REPLAY
+	RUN
 }
 
 
@@ -114,8 +114,8 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 		book.page = 0;
 
+		// Generate some random number is is a `new` test
 		if (mode == NEW) {
-			// Generate some random number is is a `new` test
 			var lst = Utils.get_random_tab(nb_max);
 			var sb = new StringBuilder.sized(nb_max * 5);
 
@@ -130,25 +130,27 @@ public class MainWindow : Gtk.ApplicationWindow {
 					sb.append_printf("\"%d\" ", i);
 			}
 			buffer.set_text(sb.str.data);
+		}
 
 			//here
-			FileUtils.chmod(push_swap_emp, 0000755);
+		FileUtils.chmod(push_swap_emp, 0000755);
 
-			// Run the push_swap in thread (ASync)
-			var thread = new Thread<string>(null, () => {
-				string stdout;
-				try {
-					Process.spawn_command_line_sync(@"$(push_swap_emp) $(buffer.get_text())", out stdout, null);
-				} catch (Error e) {
-					warning(e.message);
-				} 
-				Idle.add(run_push_swap.callback);
-				return stdout;
-			});
+		// Run the push_swap in thread (ASync)
+		var thread = new Thread<string>(null, () => {
+			string stdout;
+			try {
+				Process.spawn_command_line_sync(@"$(push_swap_emp) $(buffer.text)", out stdout, null);
+			} catch (Error e) {
+				warning(e.message);
+			} 
+			Idle.add(run_push_swap.callback);
+			return stdout;
+		});
 
-			yield;
-			stream = thread.join();
-		}
+		yield;
+		stream = thread.join();
+
+
 		book.page = 1;
 		if (stream == "") {
 			gtk_warn(warningbar, warningbar_label, "nothing to replay or push_swap did'nt print anything");
@@ -156,14 +158,41 @@ public class MainWindow : Gtk.ApplicationWindow {
 			return ;
 		}
 
+		int[] normalize (string[] bfs) {
+			var list = new SList<int>();
+			int []tab = {};
+			foreach(var i in bfs) {
+				if (i == "")
+					continue ;
+				int nb = int.parse(i);	
+				list.append(nb);
+				tab += nb;
+			}
 
-		stackA.clear(nb_max);
-		stackB.clear(nb_max);
-		var bfs = buffer.get_text().replace("\"", "");
-		foreach (var i in bfs.split(" ")) {
-			if (i == "")
-				continue ;
-			stackA.stack.push_tail(int.parse(i));
+			list.sort ((a, b) => {
+				return a - b;
+			});
+
+			for (var i = 0; i!= tab.length; ++i) {
+				tab[i] = list.index (tab[i]) + 1;
+			}
+			return tab;
+		}
+
+
+
+
+		var bfs = buffer.text.replace("\"", "").split(" ");
+		int []tab = normalize(bfs);
+
+		int max = nb_max;
+		if (mode == RUN)
+			max = bfs.length;
+
+		stackA.clear(max);
+		stackB.clear(max);
+		foreach (var i in tab) {
+			stackA.stack.push_tail(i);
 		}
 
 		run_programme.begin(stream, ()=> {
@@ -186,16 +215,15 @@ public class MainWindow : Gtk.ApplicationWindow {
 				if (regex.match(i))
 					tmp += i;
 			}
-			hit_label.label = "---";
 			split = tmp;
 			split_len = split.length;
+			hit_label.label = "---";
 		}
 		
 
 		scale.set_value(0);
 		scale.set_range(0.0, (double)split_len);
 
-		print("%s\n", stream); //TODO //TODO //TODO    
 		// fill the window_dialog
 		var lst_button = new List<Gtk.Button>();
 		dialog_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0) {
@@ -205,7 +233,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		for (var i = 0; i != split.length + 1; i++) {
 			Gtk.Button tmp;
 			if (i == split_len) {
-				tmp = new Gtk.Button.with_label("---");
+				tmp = new Gtk.Button.with_label(@"- $split_len -");
 			}
 			else
 				tmp = new Gtk.Button.with_label(@"$(i) $(split[i])");
@@ -222,13 +250,12 @@ public class MainWindow : Gtk.ApplicationWindow {
 		}
 
 		while (true) {
-
 			yield Utils.usleep(speed);
 
 			// si le programme est sur stop il doit tourner ici en boucle
 			// sauf si le programme est entrain de mourir ou que l'utilisateur utilise le scale
 			while (is_stop && is_killing == false && is_scaling == false) {
-				yield Utils.sleep(350);
+				yield Utils.sleep(50);
 			}
 
 			if (is_killing == true)
@@ -255,24 +282,23 @@ public class MainWindow : Gtk.ApplicationWindow {
 					--count;
 			}
 			
-			if (count == target)
-				is_scaling = false;
-			if (is_scaling == true)
-				continue;
-
 			if (target >= split_len)
 				target = split_len;
-			if (count > split_len)
+			if (count > split_len) {
 				continue;
+			}
 
-			scale.set_value((double)target);
-			lst_button.nth_data(count).focus(Gtk.DirectionType.DOWN);
+			if (count == target && count != split_len) {
+				is_scaling = false;
+				scale.set_value((double)target);
+				lst_button.nth_data(count).focus(Gtk.DirectionType.DOWN);
+			}
 			if (count != split_len) {
 				if (count >= 0)
 					hit_label.label = @"$(split[count]) $(count)";
 			}
 			else {
-				hit_label.label = @"---";
+				hit_label.label = @"- $split_len -";
 			}
 
 			stackA.refresh();
@@ -319,7 +345,16 @@ public class MainWindow : Gtk.ApplicationWindow {
 	[GtkChild]
 	unowned Gtk.Viewport dialog_view; 
 
-	public string push_swap_emp {get {return buffer_push_swap.text;} set {buffer_push_swap.set_text(value.data);}}
+	private string _push_swap_emp;
+	public string push_swap_emp {
+		get {
+			_push_swap_emp = "./" + buffer_push_swap.text;
+			return _push_swap_emp;
+		}
+		set {
+			buffer_push_swap.set_text(value.data);
+		}
+	}
 	public int nb_max { get {return (int)number_max.value;} set {number_max.value =(double)value;}}
 
 
@@ -346,8 +381,14 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 	[GtkCallback]
 	public void sig_replay() {
-		run_push_swap.begin(REPLAY);
-	} 
+		run_push_swap.begin(RUN);
+	}
+	[GtkCallback]
+	public void sig_hide_img (Gtk.ToggleButton btn) {
+		var img = (Gtk.Image)btn.child;
+		img.icon_name = img.icon_name == "go-previous-symbolic" ? "go-next-symbolic" : "go-previous-symbolic";
+	}
+
 	
 	[GtkCallback]
 	public void sig_better_way_toggle(Gtk.ToggleButton button) {
