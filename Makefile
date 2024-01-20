@@ -1,13 +1,16 @@
 _SRC= window_program.vala Utils.vala functions.vala DrawStack.vala main.vala window.vala
 SRC= $(addprefix src/,$(_SRC))
 CFLAGS= -Ofast -flto -w
-PKG=gtk4 gee-0.8 
-FLAGS=--enable-experimental
+PKG=gtk4
+FLAGS=--enable-experimental -g
 
 FLAGSVALA = $(addprefix --pkg=,$(PKG))  $(addprefix -X ,$(CFLAGS)) $(FLAGS) 
 NAME=visualizer
 
-all: $(NAME)
+all: t $(NAME)
+
+t : 
+	rm -rf src/*.c
 
 $(NAME): ui/window.ui build/gresource.c $(SRC)
 	valac $(SRC) $(FLAGSVALA) build/gresource.c --gresources=gresource.xml -o $(NAME)
