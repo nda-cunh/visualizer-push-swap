@@ -13,11 +13,6 @@ public void gtk_warn (Gtk.InfoBar bar, Gtk.Label bar_label, string txt) {
 	});
 }
 
-// [GtkTemplate (ui = "/ui/window.ui")]
-// public class dialog_win: Gtk.Window {
-// 
-// }
-
 [GtkTemplate (ui = "/ui/window.ui")]
 public class MainWindow : Gtk.ApplicationWindow {
 
@@ -137,9 +132,19 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 		// Run the push_swap in thread (ASync)
 		var thread = new Thread<string>(null, () => {
-			string stdout;
+			string stdout = "";
 			try {
-				Process.spawn_command_line_sync(@"$(push_swap_emp) $(buffer.text)", out stdout, null);
+			string []argvp;
+				Shell.parse_argv (@"$(push_swap_emp) $(buffer.text)", out argvp);
+				var proc = new Subprocess.newv (argvp, SubprocessFlags.STDOUT_PIPE);
+				var pipe = proc.get_stdout_pipe ();
+				uint8 buffer[8193];
+				size_t len;
+				while ((len = pipe.read (buffer[0:8192]) ) > 0) {
+					buffer[len] = '\0';
+					stdout += (string)buffer;
+				}
+				proc.wait ();
 			} catch (Error e) {
 				warning(e.message);
 			} 
@@ -249,6 +254,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 			dialog_box.append (tmp);
 		}
 
+		Timer timer = new Timer();
 		while (true) {
 			yield Utils.usleep(speed);
 
@@ -291,7 +297,10 @@ public class MainWindow : Gtk.ApplicationWindow {
 			if (count == target && count != split_len) {
 				is_scaling = false;
 				scale.set_value((double)target);
-				lst_button.nth_data(count).focus(Gtk.DirectionType.DOWN);
+				if (timer.elapsed() >= 0.13) {
+					lst_button.nth_data(count).focus(Gtk.DirectionType.DOWN);
+					timer.reset ();
+				}
 			}
 			if (count != split_len) {
 				if (count >= 0)
