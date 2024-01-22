@@ -20,6 +20,10 @@ template $MainWindow: ApplicationWindow {
 			label: "Loading ...";
 			justify: center;
 		}
+		Button {
+			label: "Cancel";
+			clicked => $sig_cancel();
+		}
 	}
 
 

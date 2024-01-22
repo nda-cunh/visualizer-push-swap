@@ -20,39 +20,9 @@ public class MainWindow : Gtk.ApplicationWindow {
 	DrawStack stackA;
 	DrawStack stackB;
 
-
-	void change_speed () {
-		var _speed = (int)speed_button.value;
-		switch (_speed) {
-			case 1:
-				this.speed = 200000;
-				break;
-			case 2:
-				this.speed = 40001;
-				break;
-			case 3:
-				this.speed = 25001;
-				break;
-			case 4:
-				this.speed = 5001;
-				break;
-			case 5:
-				this.speed = 2501;
-				break;
-			case 6:
-				this.speed = 501;
-				break;
-			case 7:
-				this.speed = 151;
-				break;
-			case 8:
-				this.speed = 2;
-				break;
-		}
-	}
-
 	public MainWindow(Gtk.Application app) {
 		Object(application: app);
+		cancel = new Cancellable ();
 		init_event();
 
 		stackA = new DrawStack(area_a, A);
@@ -91,6 +61,38 @@ public class MainWindow : Gtk.ApplicationWindow {
 			is_stop = continue_stop.active;
 		});
 	}
+
+
+	void change_speed () {
+		var _speed = (int)speed_button.value;
+		switch (_speed) {
+			case 1:
+				this.speed = 200000;
+				break;
+			case 2:
+				this.speed = 40001;
+				break;
+			case 3:
+				this.speed = 25001;
+				break;
+			case 4:
+				this.speed = 5001;
+				break;
+			case 5:
+				this.speed = 2501;
+				break;
+			case 6:
+				this.speed = 501;
+				break;
+			case 7:
+				this.speed = 151;
+				break;
+			case 8:
+				this.speed = 2;
+				break;
+		}
+	}
+
 
 	async void run_push_swap (runMode mode) {
 
@@ -132,24 +134,44 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 		// Run the push_swap in thread (ASync)
 		var thread = new Thread<string>(null, () => {
-			string stdout = "";
-			try {
+			var sb = new StringBuilder.sized (16384);
 			string []argvp;
+			Subprocess proc;
+			InputStream pipe;
+
+			try {
 				Shell.parse_argv (@"$(push_swap_emp) $(buffer.text)", out argvp);
-				var proc = new Subprocess.newv (argvp, SubprocessFlags.STDOUT_PIPE);
-				var pipe = proc.get_stdout_pipe ();
-				uint8 buffer[8193];
-				size_t len;
-				while ((len = pipe.read (buffer[0:8192]) ) > 0) {
-					buffer[len] = '\0';
-					stdout += (string)buffer;
-				}
-				proc.wait ();
+				proc = new Subprocess.newv (argvp, SubprocessFlags.STDOUT_PIPE);
+				pipe = proc.get_stdout_pipe ();
 			} catch (Error e) {
-				warning(e.message);
+				gtk_warn(warningbar, warningbar_label, @"$(e.message)");
+				return "";
 			} 
+
+			// Get all output of push_swap
+			uint8 buffer[129];
+			size_t len;
+
+			cancel.cancelled.connect (()=> {
+				proc.force_exit ();
+			});
+
+			try {
+				while ((len = pipe.read (buffer[0:128], cancel) ) > 0) {
+					buffer[len] = '\0';
+					sb.append ((string)buffer);
+				}
+				proc.wait (cancel);
+			}catch (Error e) {
+				printerr("[Cancel]> %s\n", e.message);
+			}
+			if (proc.get_exit_status () != 0 || proc.get_if_signaled ()) {
+				gtk_warn(warningbar, warningbar_label, @"ERROR PushSwap your push_swap crash ???");
+				warning (@"Here the input: [[[$(string.joinv (" ", argvp))]]]");
+			}
+			cancel.reset ();
 			Idle.add(run_push_swap.callback);
-			return stdout;
+			return sb.str;
 		});
 
 		yield;
@@ -297,11 +319,13 @@ public class MainWindow : Gtk.ApplicationWindow {
 			if (count == target && count != split_len) {
 				is_scaling = false;
 				scale.set_value((double)target);
-				if (timer.elapsed() >= 0.13) {
-					lst_button.nth_data(count).focus(Gtk.DirectionType.DOWN);
-					timer.reset ();
-				}
 			}
+			
+			if (timer.elapsed() >= 0.04) {
+				lst_button.nth_data(count).focus(Gtk.DirectionType.DOWN);
+				timer.reset ();
+			}
+
 			if (count != split_len) {
 				if (count >= 0)
 					hit_label.label = @"$(split[count]) $(count)";
@@ -372,6 +396,12 @@ public class MainWindow : Gtk.ApplicationWindow {
 	*/
 
 	[GtkCallback]
+	public void sig_cancel() {
+		print("Cancel !\n");
+		cancel.cancel ();
+	}
+
+	[GtkCallback]
 	public void sig_step_left() {
 		if (target != 0)
 			target--;
@@ -426,6 +456,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 	private int target = 0;
 	public int speed = 0; 
+	public Cancellable			cancel;
 	private string stream;
 	private bool is_replay		{get; set; default=false;}
 	private bool is_running		{get; set; default=false;}
