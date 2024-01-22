@@ -149,7 +149,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 			} 
 
 			// Get all output of push_swap
-			uint8 buffer[129];
+			uint8 buffer[33];
 			size_t len;
 
 			cancel.cancelled.connect (()=> {
@@ -157,13 +157,17 @@ public class MainWindow : Gtk.ApplicationWindow {
 			});
 
 			try {
-				while ((len = pipe.read (buffer[0:128], cancel) ) > 0) {
+				while ((len = pipe.read (buffer[0:32], cancel) ) > 0) {
 					buffer[len] = '\0';
 					sb.append ((string)buffer);
 				}
 				proc.wait (cancel);
 			}catch (Error e) {
 				printerr("[Cancel]> %s\n", e.message);
+				cancel.reset ();
+				Idle.add(run_push_swap.callback);
+				print ("Output: [%s]\n", sb.str);
+				return sb.str;
 			}
 			if (proc.get_exit_status () != 0 || proc.get_if_signaled ()) {
 				gtk_warn(warningbar, warningbar_label, @"ERROR PushSwap your push_swap crash ???");
@@ -176,7 +180,6 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 		yield;
 		stream = thread.join();
-
 
 		book.page = 1;
 		if (stream == "") {
@@ -205,8 +208,6 @@ public class MainWindow : Gtk.ApplicationWindow {
 			}
 			return tab;
 		}
-
-
 
 
 		var bfs = buffer.text.replace("\"", "").split(" ");
@@ -268,7 +269,13 @@ public class MainWindow : Gtk.ApplicationWindow {
 			lst_button.append(tmp);
 			int n = i;
 			tmp.clicked.connect(()=> {
-				target = n;
+				scale.set_value (n);
+				if (i == split_len) {
+					scale.set_value (split_len);
+					target = split_len;
+				}
+				else
+					target = n;
 				is_scaling = true;
 				continue_stop.active = true;
 				speed = 0;
@@ -321,8 +328,8 @@ public class MainWindow : Gtk.ApplicationWindow {
 				scale.set_value((double)target);
 			}
 			
-			if (timer.elapsed() >= 0.04) {
-				lst_button.nth_data(count).focus(Gtk.DirectionType.DOWN);
+			if (count != target && timer.elapsed() >= 0.02) {
+				lst_button.nth_data(target).focus(Gtk.DirectionType.DOWN);
 				timer.reset ();
 			}
 
