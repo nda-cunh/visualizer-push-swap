@@ -327,7 +327,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 				continue;
 			}
 
-			if (count == target && count != split_len) {
+			if (count == target) {
 				is_scaling = false;
 				scale.set_value((double)target);
 			}
