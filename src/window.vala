@@ -24,7 +24,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		Object(application: app);
 		cancel = new Cancellable ();
 		init_event();
-
+		timer_click_run = new Timer();
 		stackA = new DrawStack(area_a, A);
 		stackB = new DrawStack(area_b, B);
 
@@ -217,9 +217,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		var bfs = buffer.text.replace("\"", "").split(" ");
 		int []tab = normalize(bfs);
 
-		int max = nb_max;
-		if (mode == RUN)
-			max = bfs.length;
+		int max = bfs.length - 1;
 
 		stackA.clear(max);
 		stackB.clear(max);
@@ -426,12 +424,18 @@ public class MainWindow : Gtk.ApplicationWindow {
 	}
 	[GtkCallback]
 	public void sig_new () {
-		run_push_swap.begin(NEW);
+		if (timer_click_run.elapsed () >= 1.0) {
+			run_push_swap.begin(NEW);
+			timer_click_run.reset ();
+		}
 	} 
 
 	[GtkCallback]
 	public void sig_replay() {
-		run_push_swap.begin(RUN);
+		if (timer_click_run.elapsed () >= 1.0) {
+			run_push_swap.begin(RUN);
+			timer_click_run.reset ();
+		}
 	}
 	[GtkCallback]
 	public void sig_hide_img (Gtk.ToggleButton btn) {
@@ -469,6 +473,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 	public int speed = 0; 
 	public Cancellable			cancel;
 	private string stream;
+	public Timer timer_click_run;
 	private bool is_replay		{get; set; default=false;}
 	private bool is_running		{get; set; default=false;}
 	private bool is_reverse		{get; set; default=false;}
