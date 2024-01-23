@@ -100,6 +100,10 @@ public class MainWindow : Gtk.ApplicationWindow {
 			gtk_warn(warningbar, warningbar_label, @"push_swap not found ! path: [$(push_swap_emp)]");
 			return;	
 		}
+		if (FileUtils.test(push_swap_emp, FileTest.IS_DIR)) {
+			gtk_warn(warningbar, warningbar_label, @"push_swap is a directory");
+			return;	
+		}
 		
 		if (is_running == true) {
 			is_killing = true;

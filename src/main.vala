@@ -41,11 +41,19 @@ class Application : Gtk.Application {
 
 
 string? search_path() {
+	bool is_good  (string path) {
+		if (FileUtils.test(path, FileTest.EXISTS | FileTest.IS_EXECUTABLE)) {
+			if (FileUtils.test(path, FileTest.IS_DIR))
+				return false;
+			return true;
+		}
+		return false;
+	}
 	print("recherche de:	 ./push_swap\n");
-	if (FileUtils.test("push_swap", FileTest.EXISTS | FileTest.IS_EXECUTABLE))
+	if (is_good("./push_swap"))
 		return "./push_swap";
 	print("recherche de:	 ../push_swap\n");
-	if (FileUtils.test("../push_swap", FileTest.EXISTS | FileTest.IS_EXECUTABLE))
+	if (is_good("../push_swap"))
 		return "../push_swap";
 	printerr("le programme push_swap n'existe pas ou n'est pas executable.\n");
 	return null;
