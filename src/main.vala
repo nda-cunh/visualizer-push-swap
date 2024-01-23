@@ -49,13 +49,20 @@ string? search_path() {
 		}
 		return false;
 	}
-	print("recherche de:	 ./push_swap\n");
+	
+	print("looking for:	 ./push_swap\n");
 	if (is_good("./push_swap"))
 		return "./push_swap";
-	print("recherche de:	 ../push_swap\n");
+	
+	print("looking for:	 ../push_swap\n");
 	if (is_good("../push_swap"))
 		return "../push_swap";
-	printerr("le programme push_swap n'existe pas ou n'est pas executable.\n");
+	
+	print("looking for:	 ../push_swap/push_swap\n");
+	if (is_good("../push_swap/push_swap"))
+		return "../push_swap/push_swap";
+
+	printerr("your push_swap is not found :)\n");
 	return null;
 }
 
