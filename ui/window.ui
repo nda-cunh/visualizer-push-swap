@@ -286,7 +286,7 @@ Enter your text here and [Run] the program</property>
                     <child>
                       <object class="GtkScrolledWindow">
                         <property name="vexpand">true</property>
-                        <property name="visible" bind-source="hide" bind-property="active" bind-flags="sync-create"/>
+                        <property name="visible" bind-source="hide" bind-property="active" bind-flags="sync-create|invert-boolean"/>
                         <property name="kinetic-scrolling">true</property>
                         <property name="overlay-scrolling">true</property>
                         <property name="min-content-height">300</property>
