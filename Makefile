@@ -7,12 +7,14 @@ FLAGS=--enable-experimental -g
 FLAGSVALA = $(addprefix --pkg=,$(PKG))  $(addprefix -X ,$(CFLAGS)) $(FLAGS) 
 NAME=visualizer
 
+UI=ui/window.ui
+
 all: t $(NAME)
 
 t : 
 	rm -rf src/*.c
 
-$(NAME): ui/window.ui build/gresource.c $(SRC)
+$(NAME): build/gresource.c $(UI) $(SRC)
 	valac $(SRC) $(FLAGSVALA) build/gresource.c --gresources=gresource.xml -o $(NAME)
 
 build/gresource.c : gresource.xml ui/window.ui ui/style.css
@@ -20,7 +22,7 @@ build/gresource.c : gresource.xml ui/window.ui ui/style.css
 	mkdir -p build
 	mv gresource.c build/ 
 
-ui/window.ui: window.blp
+$(UI):
 	blueprint-compiler compile $< > $@
 
 re: fclean all
