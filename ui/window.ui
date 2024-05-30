@@ -284,16 +284,21 @@ Enter your text here and [Run] the program</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkScrolledWindow">
-                        <property name="vexpand">true</property>
-                        <property name="visible" bind-source="hide" bind-property="active" bind-flags="sync-create|invert-boolean"/>
-                        <property name="kinetic-scrolling">true</property>
-                        <property name="overlay-scrolling">true</property>
-                        <property name="min-content-height">300</property>
-                        <property name="min-content-width">100</property>
+                      <object class="GtkRevealer">
+                        <property name="transition-type">2</property>
+                        <property name="reveal-child" bind-source="hide" bind-property="active" bind-flags="sync-create|invert-boolean"/>
                         <child>
-                          <object class="GtkViewport" id="dialog_view">
-                            <property name="scroll-to-focus">true</property>
+                          <object class="GtkScrolledWindow">
+                            <property name="vexpand">true</property>
+                            <property name="kinetic-scrolling">true</property>
+                            <property name="overlay-scrolling">true</property>
+                            <property name="min-content-height">300</property>
+                            <property name="min-content-width">100</property>
+                            <child>
+                              <object class="GtkViewport" id="dialog_view">
+                                <property name="scroll-to-focus">true</property>
+                              </object>
+                            </child>
                           </object>
                         </child>
                       </object>
