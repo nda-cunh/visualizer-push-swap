@@ -198,15 +198,19 @@ template $MainWindow: ApplicationWindow {
 					active: true;
 					toggled => $sig_hide_img (hide);
 				}
-				ScrolledWindow {
-					vexpand:true;
-					visible: bind hide.active inverted;
-					kinetic-scrolling: true;
-					overlay-scrolling: true;
-					min-content-height: 300;
-					min-content-width: 100;
-					Viewport dialog_view {
-						scroll-to-focus:true;
+				Revealer {
+					transition-type: slide_right;
+					reveal-child: bind hide.active inverted;
+					ScrolledWindow {
+						vexpand:true;
+						// visible: bind hide.active inverted;
+						kinetic-scrolling: true;
+						overlay-scrolling: true;
+						min-content-height: 300;
+						min-content-width: 100;
+						Viewport dialog_view {
+							scroll-to-focus:true;
+						}
 					}
 				}
 			}

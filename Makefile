@@ -22,7 +22,7 @@ build/gresource.c : gresource.xml ui/window.ui ui/style.css
 	mkdir -p build
 	mv gresource.c build/ 
 
-$(UI):
+$(UI): window.blp
 	blueprint-compiler compile $< > $@
 
 re: fclean all
