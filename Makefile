@@ -1,38 +1,17 @@
-_SRC= window_program.vala Utils.vala functions.vala DrawStack.vala main.vala window.vala
-SRC= $(addprefix src/,$(_SRC))
-CFLAGS= -Ofast -flto -w
-PKG=gtk4
-FLAGS=--enable-experimental -g
+# a Makefile using meson and ninja to build the project
 
-FLAGSVALA = $(addprefix --pkg=,$(PKG))  $(addprefix -X ,$(CFLAGS)) $(FLAGS) 
-NAME=visualizer
+all: build/build.ninja
+	ninja -C build
+	ninja install -C build
 
-UI=ui/window.ui
+build/build.ninja:
+	meson build --prefix="$(PWD)" --bindir="" --optimization=3 --buildtype=release
 
-all: t $(NAME)
-
-t : 
-	rm -rf src/*.c
-
-$(NAME): build/gresource.c $(UI) $(SRC)
-	valac $(SRC) $(FLAGSVALA) build/gresource.c --gresources=gresource.xml -o $(NAME)
-
-build/gresource.c : gresource.xml ui/window.ui ui/style.css
-	glib-compile-resources --generate-source gresource.xml	
-	mkdir -p build
-	mv gresource.c build/ 
-
-$(UI): window.blp
-	blueprint-compiler compile $< > $@
-
-re: fclean all
-
-fclean: clean
-	rm -rf $(NAME)
-
-clean:
-	rm -rf ui/window.ui
+uninstall:
+	ninja uninstall -C build
 	rm -rf build
 
+re: uninstall all
+
 run: all
-	./$(NAME) 50 
+	./visualizer

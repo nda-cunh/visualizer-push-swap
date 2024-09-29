@@ -1,31 +1,20 @@
 project('visualizer-push-swap', ['c', 'vala'], version : '0.1')
-gnome = import('gnome')
-# , default_options : ['b_sanitize=address']
-add_project_arguments('--enable-experimental', language: 'vala')
-add_project_arguments('--enable-deprecated', language: 'vala')
-add_project_arguments('-g', language: 'vala')
 
+# BluePrint-Compiler compile all .blp files 
 blueprints = custom_target('blueprints',
   input: files(
-    'window.blp'
+    'data/window.blp'
   ),
   output: '.',
   command: [find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],
 )
 
+# GResources (add style.css and blueprint in the resources)
+gnome = import('gnome')
 asresources = gnome.compile_resources(
-    'as-resources', 'gresource.xml',
+    'as-resources', 'data/gresource.xml',
     dependencies: blueprints,
 )
 
-executable('visualizer',
-  asresources,
-           'src/DrawStack.vala',
-           'src/functions.vala',
-           'src/main.vala',
-           'src/Utils.vala',
-           'src/window_program.vala',
-           'src/window.vala',
-           dependencies : [
-              dependency('gtk4')],
-           install : true)
+# Create the executable
+subdir('src')

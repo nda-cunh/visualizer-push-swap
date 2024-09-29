@@ -13,7 +13,7 @@ public void gtk_warn (Gtk.InfoBar bar, Gtk.Label bar_label, string txt) {
 	});
 }
 
-[GtkTemplate (ui = "/ui/window.ui")]
+[GtkTemplate (ui = "/data/window.ui")]
 public class MainWindow : Gtk.ApplicationWindow {
 
 	public bool main_param {get;set;}
