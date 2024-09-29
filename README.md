@@ -4,36 +4,37 @@ display your A and B stacks for the push_swap project at school 42
 
 <img src="push_viz.gif"/>
 
-## Installation  (No Suprapack)
+# Installation  (No Suprapack)
 
-```git clone https://gitlab.com/nda-cunh/visualizer-push-swap```
-
+```bash
+git clone https://gitlab.com/nda-cunh/visualizer-push-swap
+```
 ### dependency :
 - gtk4
 - (C-compiler) and valac
 
-#### for 42 Angouleme or if you have valac dependency :
 
-# With Shell script:
+## With Shell script:
 ```bash
 ./install.sh
 ```
 
-# With Meson build:
+## With Meson build:
 ```bash
 meson build --prefix=$PWD --bindir=''
 ninja -C build install
 ```
 
-## Installation  (With Suprapack)
+# Installation  (With Suprapack)
 
 ```bash
 suprapack install visualizer-pushswap
 ```
 
 <br>
+----------------------------------------------------
 
-## how use it ???
+# how use it ???
 
 it search your `push_swap` here:  `./push_swap`  or  `../push_swap`
 
