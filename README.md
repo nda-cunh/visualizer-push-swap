@@ -4,32 +4,46 @@ display your A and B stacks for the push_swap project at school 42
 
 <img src="push_viz.gif"/>
 
-## Installation
+## Installation  (No Suprapack)
 
-```git clone https://gitlab.com/hydrasho/visualizer-push-swap```
+```git clone https://gitlab.com/nda-cunh/visualizer-push-swap```
 
 ### dependency :
-- gtk3
-- gcc or clang or valac
+- gtk4
+- (C-compiler) and valac
 
 #### for 42 Angouleme or if you have valac dependency :
 
-```make```
+# With Shell script:
+```bash
+./install.sh
+```
 
-#### Other campus or if you don't have vala compiler :
-he use C-Code instead of vala code
+# With Meson build:
+```bash
+meson build --prefix=$PWD --bindir=''
+ninja -C build install
+```
 
-```make bootstrap```
+## Installation  (With Suprapack)
 
+```bash
+suprapack install visualizer-pushswap
+```
 
 <br>
 
-## how use it 
+## how use it ???
 
-he search your push_swap here:  ./push_swap  or  ../push_swap
+it search your `push_swap` here:  `./push_swap`  or  `../push_swap`
 
-```./visualiser [1-1000]```
+```bash
+./visualiser [1-1000]
+```
 
+please use `visualizer --help` 
+
+<br>
 <br>
 
 # [ F.A.Q ]
@@ -41,8 +55,8 @@ Why my window is not in black-mode ?:
 I don't understand why but my page is stuck when loading
 > your push_swap is great in an infinite loop
 
-I can't compile ???
-> install libgtk-4-dev and valac
+I can't compile it ???
+> install libgtk-4-dev and valac or use suprapack (package manager)
 
 
 
@@ -53,5 +67,4 @@ I can't compile ???
 # Note
 I also have a push_swap tester (linux)
 
-https://github.com/hydrasho/push_swap_tester
-
+https://github.com/nda-cunh/push_swap_tester
