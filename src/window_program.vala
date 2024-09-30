@@ -47,11 +47,6 @@ public bool reverse(string line, Queue<int> stackA, Queue<int> stackB)
 
 
 
-
-
-
-
-
 public bool forward (string line, Queue<int> stackA, Queue<int> stackB)
 {
 	switch (line) {

@@ -18,6 +18,8 @@ public void gtk_warn (Gtk.InfoBar bar, Gtk.Label bar_label, string txt) {
 	});
 }
 
+
+
 [GtkTemplate (ui = "/data/window.ui")]
 public class MainWindow : Gtk.ApplicationWindow {
 
@@ -191,6 +193,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		yield;
 		stream = thread.join();
 
+		// If the push_swap did'nt print anything
 		book.page = PageType.LOADING;
 		if (stream == "") {
 			gtk_warn(warningbar, warningbar_label, "nothing to replay or push_swap did'nt print anything");
@@ -198,27 +201,11 @@ public class MainWindow : Gtk.ApplicationWindow {
 			return ;
 		}
 
-		int[] normalize (string[] bfs) {
-			Array<int> tab = new GLib.Array<int>.sized(false, false, sizeof(int), (uint)(bfs.length * sizeof(int)));
-			foreach (var i in bfs) {
-				if (i == "")
-					continue ;
-				int nb = int.parse(i);
-				tab.append_val (nb);
-			}
-
-			tab.sort ((a, b) => {
-				return a - b;
-			});
-
-			return (owned)tab.data;
-		}
-
-
 		var bfs = buffer.text.replace("\"", "").split(" ");
 
-		int []tab = normalize(bfs);
-		int max = bfs.length - 1;
+		var tab = Utils.normalize(bfs);
+		var max = bfs.length - 1;
+
 
 		stackA.clear(max);
 		stackB.clear(max);
@@ -226,27 +213,33 @@ public class MainWindow : Gtk.ApplicationWindow {
 			stackA.stack.push_tail(i);
 		}
 
-		run_programme.begin(stream, ()=> {
-			is_killing = false;
-		});
+		yield run_programme(stream);
+		is_killing = false;
 	}
 
 
-	// Lit le stream du push_swap  (sa\n pa\n ra\n  ...)
+
+
+
+	/***
+	 * Run the push_swap
+	 * @param stream: the output of the push_swap
+	 */
 	async void run_programme(string stream) {
 		var split = stream.strip().split("\n");
 		int split_len;
 		int count = 0;
 		target = 0;
 
+		// Change stream string to array of string (remove all invalid instruction) only sa/pa/ra/rra...
 		{
-			string []tmp = {};
+			var strv_builder = new StrvBuilder();
 			var regex = /^sa$|^sb$|^ss$|^pa$|^pb$|^ra$|^rb$|^rr$|^rra$|^rrb$|^rrr$/;
 			foreach (unowned var i in split) {
 				if (regex.match(i))
-					tmp += i;
+					strv_builder.add(i);
 			}
-			split = tmp;
+			split = strv_builder.end();
 			split_len = split.length;
 			hit_label.label = "---";
 		}
@@ -261,7 +254,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 			name = "dialog_box"
 		};
 		dialog_view.child = dialog_box;
-		for (var i = 0; i != split.length + 1; i++) {
+		for (var i = 0; i != split.length + 1; ++i) {
 			Gtk.Button tmp;
 			if (i == split_len) {
 				tmp = new Gtk.Button.with_label(@"- $split_len -");
@@ -423,13 +416,13 @@ public class MainWindow : Gtk.ApplicationWindow {
 	[GtkCallback]
 	public void sig_step_left() {
 		if (target != 0)
-			target--;
+			--target;
 		is_scaling = true;
 	}
 
 	[GtkCallback]
 	public void sig_step_right() {
-		target++;
+		++target;
 		is_scaling = true;
 	}
 
@@ -474,6 +467,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 
 
+
 	/***
 	 * All Private Variables
 	 *********************************/
@@ -485,6 +479,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 	private Gtk.Box			dialog_box;
 	private DrawStack		stackA;
 	private DrawStack		stackB;
+
 
 
 

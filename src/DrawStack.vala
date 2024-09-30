@@ -1,11 +1,6 @@
 
-enum DrawType {
-	A,
-	B
-}
 
-
-class DrawStack {
+public class DrawStack {
 	public DrawStack (Gtk.DrawingArea area, DrawType type) {
 		this.area = area;
 		this.type = type;
@@ -13,25 +8,30 @@ class DrawStack {
 		stack = new Queue<int>();
 		area.set_draw_func(drawing_func);
 	}
-	
+
+
 	public void clear (int nb_max) {
 		stack.clear ();
 		this.len_max = nb_max;
 	}
-	
+
+
 	public void refresh () {
 		area.queue_draw ();
 	}
 
+
 	public void drawing_func (Gtk.DrawingArea self, Cairo.Context ctx, int width, int height) {
+		double		color_a;
+		double		y;
+		double		G_SIZE;
+		int			G_ZOOM;
+
+
 		if (type == A)
 			ctx.set_source_rgb(1.0, 0.0, 1.0);
 		else
 			ctx.set_source_rgb(0.0, 0.0, 1.0);
-				double		color_a;
-		double		y;
-		int G_ZOOM;
-		double G_SIZE;
 
 		if (len_max <= 10) {
 			G_ZOOM = 40;
@@ -87,8 +87,15 @@ class DrawStack {
 		}
 	}
 
-	public int len_max;
-	private DrawType type;
-	public Queue<int> stack;
-	private unowned Gtk.DrawingArea area;
+
+	public enum DrawType {
+		A,
+		B
+	}
+
+
+	public	Queue<int>		stack;
+	private	int				len_max;
+	private	DrawType		type;
+	private	Gtk.DrawingArea	area;
 }
