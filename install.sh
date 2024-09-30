@@ -32,6 +32,6 @@ fi
 
 if [ ! -f build/build.ninja ]; then
 	echo "building..."
-	meson build --prefix="$PWD" --bindir='' --optimization=3 --buildtype=release
+	meson build --prefix="$PWD" --bindir='' --buildtype=release
 fi
 ninja install -C build

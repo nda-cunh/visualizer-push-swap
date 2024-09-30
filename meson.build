@@ -1,4 +1,4 @@
-project('visualizer-push-swap', ['c', 'vala'], version : '0.1')
+project('visualizer-push-swap', ['c', 'vala'], version : '0.1', default_options : ['optimization=3', 'buildtype=release'])
 
 # BluePrint-Compiler compile all .blp files 
 blueprints = custom_target('blueprints',
