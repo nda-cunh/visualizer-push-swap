@@ -11,7 +11,7 @@ git clone https://gitlab.com/nda-cunh/visualizer-push-swap
 ```
 ### dependency :
 - gtk4
-- (C-compiler) and valac
+- (C-compiler) and (valac optional can bootstrap)
 
 
 ## With Shell script:

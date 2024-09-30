@@ -1,8 +1,14 @@
 project('visualizer-push-swap',
-    ['c', 'vala'],
     version : '1.1',
     default_options : ['optimization=3', 'buildtype=release']
 )
+
+add_languages('c')
+need_bootstrap = not (add_languages('vala', required: false))
+
+if get_option ('bootstrap').enabled()
+  need_bootstrap = true  
+endif
 
 conf_data = configuration_data()
 conf_data.set('version', meson.project_version())
