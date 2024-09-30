@@ -1,4 +1,11 @@
-project('visualizer-push-swap', ['c', 'vala'], version : '0.1', default_options : ['optimization=3', 'buildtype=release'])
+project('visualizer-push-swap',
+    ['c', 'vala'],
+    version : '1.1',
+    default_options : ['optimization=3', 'buildtype=release']
+)
+
+conf_data = configuration_data()
+conf_data.set('version', meson.project_version())
 
 # BluePrint-Compiler compile all .blp files 
 blueprints = custom_target('blueprints',

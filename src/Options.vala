@@ -18,6 +18,11 @@ public class Options {
 		context.add_main_entries(options, null);
 		context.parse(ref args);
 
+		if (Options.version) {
+			print("push_swap visualizer %s\n", Config.VERSION);
+			Process.exit (0);
+		}
+
 		if (Options.push_swap_emp == null) {
 			var? path = search_path();
 			Options.push_swap_emp = (!)path ?? "./push_swap";
