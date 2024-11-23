@@ -247,6 +247,9 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 		scale.set_value(0);
 		scale.set_range(0.0, (double)split_len);
+		scale.clear_marks();
+		scale.add_mark(0, Gtk.PositionType.RIGHT, "0");
+		scale.add_mark(split_len, Gtk.PositionType.BOTTOM, @"$split_len");
 
 		// fill the window_dialog
 		var lst_button = new List<Gtk.Button>();
