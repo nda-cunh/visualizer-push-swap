@@ -282,6 +282,9 @@ public class MainWindow : Gtk.ApplicationWindow {
 			dialog_box.append (tmp);
 		}
 
+		area_a.queue_draw();
+		area_b.queue_draw();
+
 		Timer timer = new Timer();
 		while (true) {
 			yield Utils.usleep(speed);
