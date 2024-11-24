@@ -162,7 +162,6 @@ public class MainWindow : Gtk.ApplicationWindow {
 			buffer.set_text(sb.str.data);
 		}
 
-
 		// Run the push_swap in thread (ASync)
 		FileUtils.chmod(push_swap_emp, 0755);
 		var thread = new Thread<string>(null, () => {
@@ -201,7 +200,8 @@ public class MainWindow : Gtk.ApplicationWindow {
 			return ;
 		}
 
-		var bfs = buffer.text.replace("\"", "").split(" ");
+		var str = buffer.text.replace("\"", "")._strip();
+		var bfs = /\s+/.split(str);
 
 		var tab = Utils.normalize(bfs);
 		var max = bfs.length - 1;

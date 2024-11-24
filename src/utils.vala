@@ -2,8 +2,8 @@
 namespace Utils {
 	// take a string[] and return a int[] sorted
 	int[] normalize (string[] bfs) {
-		var vala_tab = new int[bfs.length];
-		for (int i = 0; i < bfs.length - 1; i++)
+		var vala_tab = new int[bfs.length + 1];
+		for (int i = 0; i < bfs.length; i++)
 		{
 			int nb = int.parse(bfs[i]);
 			vala_tab[i] = nb;
