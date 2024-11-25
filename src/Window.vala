@@ -131,7 +131,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 			gtk_warn(warningbar, warningbar_label, @"push_swap is a directory");
 			return;
 		}
-		lst_button = null;
+		lst_button = new List<Gtk.Button>();
 
 		// Wait the end of the last run
 		if (is_running == true) {
@@ -197,7 +197,13 @@ public class MainWindow : Gtk.ApplicationWindow {
 		book.page = PageType.LOADING;
 		if (stream == "") {
 			gtk_warn(warningbar, warningbar_label, "nothing to replay or push_swap did'nt print anything");
+			stackA.clear(0);
+			stackB.clear(0);
 			is_running = false;
+			dialog_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0) {
+				name = "dialog_box"
+			};
+			dialog_view.child = dialog_box;
 			return ;
 		}
 

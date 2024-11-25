@@ -12,6 +12,7 @@ public class DrawStack {
 
 	public void clear (int nb_max) {
 		stack.clear ();
+		this.area.queue_draw();
 		this.len_max = nb_max;
 	}
 
