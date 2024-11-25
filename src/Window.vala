@@ -131,6 +131,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 			gtk_warn(warningbar, warningbar_label, @"push_swap is a directory");
 			return;
 		}
+		lst_button = null;
 
 		// Wait the end of the last run
 		if (is_running == true) {
@@ -252,7 +253,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		scale.add_mark(split_len, Gtk.PositionType.BOTTOM, @"$split_len");
 
 		// fill the window_dialog
-		var lst_button = new List<Gtk.Button>();
+		lst_button = new List<Gtk.Button>();
 		dialog_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0) {
 			name = "dialog_box"
 		};
@@ -423,13 +424,16 @@ public class MainWindow : Gtk.ApplicationWindow {
 	public void sig_step_left() {
 		if (target != 0)
 			--target;
+		lst_button.nth_data(target).focus(Gtk.DirectionType.DOWN);
 		is_scaling = true;
 	}
 
 	[GtkCallback]
 	public void sig_step_right() {
-		++target;
+		if (target != (int)lst_button.length() - 1)
+			++target;
 		is_scaling = true;
+		lst_button.nth_data(target).focus(Gtk.DirectionType.DOWN);
 	}
 
 	[GtkCallback]
@@ -485,7 +489,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 	private Gtk.Box			dialog_box;
 	private DrawStack		stackA;
 	private DrawStack		stackB;
-
+	private List<Gtk.Button>? lst_button = null;
 
 
 
