@@ -65,13 +65,6 @@ template $MainWindow: ApplicationWindow {
 					}
 				}
 
-				SpinButton speed_button {
-					adjustment: Adjustment {
-						lower: 1.0;
-						step-increment: 1.0;
-						upper: 8.0;
-					};
-				}
 				ToggleButton continue_stop{
 					label : "Stop";
 				}
@@ -110,12 +103,13 @@ template $MainWindow: ApplicationWindow {
 					halign: end;
 					valign: end;
 					vexpand: true;
-					homogeneous: true;
+					homogeneous: false;
+					spacing: 8;
 					orientation: vertical;
 
 			// Global Settings
 					Label {
-						label: "<b>Global Setting</b>";
+						label: "<big><b>Global Setting</b></big>";
 						use-markup:true;
 						halign: start;
 					}
@@ -126,23 +120,33 @@ template $MainWindow: ApplicationWindow {
 							text: "push_swap_emp";
 						};
 					}
+					Label {
+						label: "Speed:";
+						halign: start;
+					}
+					SpinButton speed_button {
+						adjustment: Adjustment {
+							lower: 1.0;
+							step-increment: 1.0;
+							upper: 8.0;
+						};
+					}
 					Separator {
+						margin-top: 15;
+						margin-bottom: 15;
 						valign: center;
 					}
 
 			// [New] Settings
 
 					Label {
-						label: "<b>[New] Setting</b>";
+						label: "<big><b>[New] Setting</b></big>";
 						use-markup:true;
 						halign: start;
 					}
 					Label {
 						label: "Numbers to generate:";
 						halign: start;
-					}
-					Separator {
-						valign: center;
 					}
 					SpinButton number_max {
 						adjustment: Adjustment {
@@ -162,12 +166,14 @@ template $MainWindow: ApplicationWindow {
 						toggled => $sig_better_way_toggle(better_way);
 					}
 					Separator {
+						margin-top: 15;
+						margin-bottom: 15;
 						valign: center;
 					}
 			
 			// [Run] Settings
 					Label {
-						label: "<b>[Run] Setting</b>";
+						label: "<big><b>[Run] Setting</b></big>";
 						use-markup:true;
 						halign: start;
 					}
@@ -188,6 +194,9 @@ template $MainWindow: ApplicationWindow {
 						}
 					}
 				}
+			}
+			Separator {
+				orientation: horizontal;
 			}
 			DrawingArea area_a {
 				hexpand: true;
