@@ -4,8 +4,8 @@ public enum runMode {
 }
 
 public enum PageType {
-	LOADING = 1,
-	RUN = 0
+	RUNNING = 1,
+	LOADING = 0
 }
 
 
@@ -37,7 +37,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		number_max.value = Options.nb_max;
 
 		change_speed ();
-		book.page = PageType.LOADING;
+		book.page = PageType.RUNNING;
 	}
 
 
@@ -136,7 +136,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		// Wait the end of the last run
 		if (is_running == true) {
 			is_killing = true;
-			book.page = PageType.RUN;
+			book.page = PageType.LOADING;
 			while (is_killing == true)
 				yield Utils.sleep(500);
 		}
@@ -165,36 +165,44 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 		// Run the push_swap in thread (ASync)
 		FileUtils.chmod(push_swap_emp, 0755);
-		var thread = new Thread<string>(null, () => {
-			string result;
-			string []argvp;
-			Subprocess? proc = null;
+		string []argvp;
+		Subprocess? proc = null;
 
-			try {
-				Shell.parse_argv (@"$(push_swap_emp) $(buffer.text)", out argvp);
-				proc = new Subprocess.newv (argvp, SubprocessFlags.STDOUT_PIPE);
-				proc.communicate_utf8 (null, cancel, out result, null);
+		var bs = new StringBuilder ();
+		try {
+			Shell.parse_argv (@"$(push_swap_emp) $(buffer.text)", out argvp);
+			proc = new Subprocess.newv (argvp, SubprocessFlags.STDOUT_PIPE);
+			// yield proc.communicate_utf8_async (null, cancel, out result, null);
+			var pipe = proc.get_stdout_pipe ();
+			uint8 buffer[1024];
+			while (true) {
+				var size = yield pipe.read_async (buffer, Priority.DEFAULT, cancel);
+				if (size == 0)
+					break;
+				bs.append_len((string)buffer, size);
 			}
-			catch (Error e) {
-				result = "";
+			stream = (owned)bs.str;
+		}
+		catch (Error e) {
+			if (!(e is IOError.CANCELLED)) {
+				stream = (owned)bs.str;
+				proc.force_exit();
 			}
-
-			if (proc == null && proc.get_exit_status () != 0 || proc.get_if_signaled ()) {
-				gtk_warn(warningbar, warningbar_label, @"ERROR PushSwap your push_swap crash ???");
-				warning(@"Here the input: [[[$(string.joinv (" ", argvp))]]]");
-				result = "";
+			else {
+				stream = "";
 			}
+		}
 
-			cancel.reset ();
-			Idle.add(run_push_swap.callback);
-			return result;
-		});
+		if (proc == null && proc.get_exit_status () != 0 || proc.get_if_signaled ()) {
+			gtk_warn(warningbar, warningbar_label, @"ERROR PushSwap your push_swap crash ???");
+			warning(@"Here the input: [[[$(string.joinv (" ", argvp))]]]");
+			stream = "";
+		}
 
-		yield;
-		stream = thread.join();
+		cancel.reset ();
+
 
 		// If the push_swap did'nt print anything
-		book.page = PageType.LOADING;
 		if (stream == "") {
 			gtk_warn(warningbar, warningbar_label, "nothing to replay or push_swap did'nt print anything");
 			stackA.clear(0);
@@ -204,6 +212,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 				name = "dialog_box"
 			};
 			dialog_view.child = dialog_box;
+			book.page = PageType.RUNNING;
 			return ;
 		}
 
@@ -292,6 +301,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 		area_a.queue_draw();
 		area_b.queue_draw();
 
+		book.page = PageType.RUNNING;
 		Timer timer = new Timer();
 		while (true) {
 			yield Utils.usleep(speed);
