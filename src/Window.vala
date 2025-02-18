@@ -174,7 +174,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 			proc = new Subprocess.newv (argvp, SubprocessFlags.STDOUT_PIPE);
 			// yield proc.communicate_utf8_async (null, cancel, out result, null);
 			var pipe = proc.get_stdout_pipe ();
-			uint8 buffer[1024];
+			uint8 buffer[128];
 			while (true) {
 				var size = yield pipe.read_async (buffer, Priority.DEFAULT, cancel);
 				if (size == 0)
@@ -186,6 +186,11 @@ public class MainWindow : Gtk.ApplicationWindow {
 		catch (Error e) {
 			if (!(e is IOError.CANCELLED)) {
 				stream = (owned)bs.str;
+				proc.force_exit();
+			}
+			if ((e is IOError.CANCELLED)) {
+				var str = bs.str[0:30000];
+				stream = str;
 				proc.force_exit();
 			}
 			else {
