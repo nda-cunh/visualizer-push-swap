@@ -42,7 +42,7 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 
 	/***
-     * Init All Event (Signal class)
+     * Init All Eveo (Signal class)
      * Scale (change_value)
      * Speed Button (value_changed)
      * Continue Stop (toggled)
@@ -114,6 +114,47 @@ public class MainWindow : Gtk.ApplicationWindow {
 	}
 
 
+
+	string normalize_input(string input) {
+		string[] tokens = input.replace("\"", "").split(" ");
+		var values = new GenericArray<int>();
+		
+		foreach (unowned string t in tokens) {
+			unowned string stripped = t._strip();
+			if (stripped != "") {
+				values.add(int.parse(stripped));
+			}
+		}
+
+		if (values.length == 0) return "";
+
+		var sorted = new GenericArray<int>();
+		for (int i = 0; i < values.length; i++) {
+			sorted.add(values.get(i));
+		}
+
+		sorted.sort((a, b) => {
+			return (a < b) ? -1 : (a > b ? 1 : 0);
+		});
+
+		var sb = new StringBuilder.sized(values.length * 5);
+		for (int i = 0; i < values.length; ++i) {
+			int current_val = values.get(i);
+			int rank = -1;
+
+			for (int j = 0; j < sorted.length; ++j) {
+				if (sorted.get(j) == current_val) {
+					rank = j + 1;
+					break;
+				}
+			}
+			
+			sb.append_printf("%d%s", rank, (i == values.length - 1) ? "" : " ");
+		}
+
+		return (owned)sb.str;
+	}
+
 	/***
 	 * Run the push_swap
 	 * @param mode: NEW or RUN
@@ -158,15 +199,24 @@ public class MainWindow : Gtk.ApplicationWindow {
 			}
 			else {
 				foreach (var i in lst)
-					sb.append_printf("\"%d\" ", i);
+					sb.append_printf("%d ", i);
 			}
 			buffer.set_text(sb.str.data);
+		}
+		else {
+			var normalized_input = normalize_input(buffer.text);
+			buffer.set_text(normalized_input.data);
 		}
 
 		// Run the push_swap in thread (ASync)
 		FileUtils.chmod(push_swap_emp, 0755);
 		string []argvp;
 		Subprocess? proc = null;
+
+		// Normalize all item from buffer.text
+
+
+
 
 		var bs = new StringBuilder ();
 		try {
