@@ -44,5 +44,6 @@ executable('visualizer',
   c_args: '-w',
   dependencies : [
     dependency('gtk4'),
+    meson.get_compiler('c').find_library('m')
   ],
   install : true)
