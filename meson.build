@@ -1,5 +1,5 @@
 project('visualizer-push-swap',
-    version : '1.1',
+    version : '2.1',
     default_options : ['optimization=3', 'buildtype=release']
 )
 
