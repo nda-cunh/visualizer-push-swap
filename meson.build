@@ -1,10 +1,9 @@
-project('visualizer-push-swap',
+project('visualizer-push-swap', 'c',
     version : '2.1',
     default_options : ['optimization=3', 'buildtype=release']
 )
 
-add_languages('c')
-need_bootstrap = not (add_languages('vala', required: false))
+need_bootstrap = not (add_languages('vala', required: false, native: false))
 
 if get_option ('bootstrap').enabled()
   need_bootstrap = true  
