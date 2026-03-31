@@ -17,7 +17,8 @@ if ! [ -x "$(command -v meson)" ] || ! [ -x "$(command -v ninja)" ]; then
 	pip install meson ninja --user
 fi
 
-export PATH=$PATH:$HOME/.local/bin
+# Fix 42Angouleme BUG
+export PATH=/usr/bin:/bin:$HOME/.local/bin
 
 if ! [ -x "$(command -v meson)" ] || ! [ -x "$(command -v ninja)" ]; then 
 	echo "meson install failed, please install manually"
