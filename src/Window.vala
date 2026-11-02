@@ -220,7 +220,8 @@ public class MainWindow : Gtk.ApplicationWindow {
 
 		var bs = new StringBuilder ();
 		try {
-			Shell.parse_argv (@"$(push_swap_emp) $(buffer.text)", out argvp);
+			var mode_push = get_push_swap_mode();
+			Shell.parse_argv (@"$(push_swap_emp) $(mode_push) $(buffer.text)", out argvp);
 			proc = new Subprocess.newv (argvp, SubprocessFlags.STDOUT_PIPE);
 			// yield proc.communicate_utf8_async (null, cancel, out result, null);
 			var pipe = proc.get_stdout_pipe ();
@@ -428,6 +429,8 @@ public class MainWindow : Gtk.ApplicationWindow {
 	*********************************/
 
 	[GtkChild]
+	unowned Gtk.DropDown mode_push_swap;
+	[GtkChild]
 	unowned Gtk.EntryBuffer buffer;
 	[GtkChild]
 	unowned Gtk.Notebook book;
@@ -547,6 +550,23 @@ public class MainWindow : Gtk.ApplicationWindow {
 	}
 
 
+	private unowned string get_push_swap_mode () {
+		var model = mode_push_swap.model as Gtk.StringList;
+		var id = mode_push_swap.get_selected();
+
+		switch (model.get_string(id)) {
+			case "complex":
+				return "--complex";
+			case "medium":
+				return "--medium";
+			case "simple":
+				return "--simple";
+			case "adaptive":
+			default:
+				return "";
+
+		}
+	}
 
 
 	/***

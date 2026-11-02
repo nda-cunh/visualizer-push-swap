@@ -115,6 +115,17 @@ template $MainWindow: ApplicationWindow {
 						use-markup:true;
 						halign: start;
 					}
+					DropDown mode_push_swap {
+						model: StringList {
+							strings [
+								"adaptive",
+								"simple",
+								"medium",
+								"complex",
+							]
+						};
+					}
+
 					Entry {
 						has-frame:true;
 						placeholder-text: "Enter your value here";

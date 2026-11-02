@@ -1,4 +1,4 @@
-project('visualizer-push-swap', 'c',
+project('visualizer-push-swap', ['vala', 'c'],
     version : '2.1',
     default_options : ['optimization=3', 'buildtype=release']
 )
